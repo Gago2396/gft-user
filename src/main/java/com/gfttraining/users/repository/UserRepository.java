@@ -1,13 +1,12 @@
-package com.gfttraining.users.Repositoy;
+package com.gfttraining.users.repository;
 
 import com.gfttraining.users.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends JpaRepository<User, Long> {
 
     User findByName(String name);
-    void loadUsers();
 
 }
