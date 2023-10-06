@@ -23,4 +23,17 @@ public class User {
     private PaymentMethod paymentMethod;
     private int fidelityPoints;
     private double averagePurchase;
+
+    public User(Long id, String name, String lastName, String address, PaymentMethod paymentMethod, int fidelityPoints, double averagePurchase) {
+        this.id = id;
+        this.name = name;
+        this.lastName = lastName;
+        this.address = address;
+        this.paymentMethod = paymentMethod;
+        this.fidelityPoints = fidelityPoints;
+        this.averagePurchase = averagePurchase;
+    }
+
+    public User() {
+    }
 }
