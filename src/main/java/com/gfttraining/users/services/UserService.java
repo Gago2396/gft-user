@@ -26,6 +26,10 @@ public class UserService {
         }
     }
 
+    public ResponseEntity<User> deleteUserById(Long id){
+        return null;
+    }
+
     private boolean isValidUser(User user) {
         return user == null || user.getName() == null || user.getName().isEmpty() ||
                 user.getLastName() == null || user.getLastName().isEmpty() ||
