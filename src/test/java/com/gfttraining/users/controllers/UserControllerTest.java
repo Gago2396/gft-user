@@ -44,7 +44,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Testing that a User entity can be created")
+    @DisplayName("Testing that a User can be created")
     void testCreateUser() {
         ResponseEntity<User> expectedResponse = new ResponseEntity<>(testUser, HttpStatus.CREATED);
         when(userService.createUser(testUser)).thenReturn(expectedResponse);
@@ -58,4 +58,30 @@ class UserControllerTest {
 
         System.out.println("User created: " + testUser.getName());
     }
+
+    @Test
+    @DisplayName("Testing that a User can be updated by a given Id")
+    void testUpdateUserById() {
+        long userId = 1L;
+
+        User updatedUser = new User();
+        updatedUser.setId(userId);
+        updatedUser.setName("Updated John");
+        updatedUser.setLastName("Updated Doe");
+
+        ResponseEntity<User> expectedResponse = new ResponseEntity<>(updatedUser, HttpStatus.OK);
+
+        when(userService.updateUserById(userId, updatedUser)).thenReturn(expectedResponse);
+
+        ResponseEntity<User> responseEntity = userController.updateUserById(userId, updatedUser);
+
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(updatedUser, responseEntity.getBody());
+
+        verify(userService, times(1)).updateUserById(userId, updatedUser);
+
+        System.out.println("User updated: " + updatedUser.getName());
+    }
+
 }

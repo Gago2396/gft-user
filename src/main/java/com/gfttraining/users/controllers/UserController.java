@@ -19,4 +19,7 @@ public class UserController {
         return userService.createUser(user);
     }
 
+    public ResponseEntity<User> updateUserById(long userId, User updatedUser) {
+        return userService.updateUserById(userId, updatedUser);
+    }
 }

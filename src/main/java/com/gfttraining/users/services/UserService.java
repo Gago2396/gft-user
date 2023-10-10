@@ -32,4 +32,8 @@ public class UserService {
                 user.getAddress() == null || user.getAddress().isEmpty() ||
                 user.getPaymentMethod() == null;
     }
+
+    public ResponseEntity<User> updateUserById(long userId, User updatedUser) {
+        return null;
+    }
 }
