@@ -1,8 +1,8 @@
 package com.gfttraining.users;
 
-import com.gfttraining.users.repository.UserRepository;
-import com.gfttraining.users.model.PaymentMethod;
-import com.gfttraining.users.model.User;
+import com.gfttraining.users.repositories.UserRepository;
+import com.gfttraining.users.models.PaymentMethod;
+import com.gfttraining.users.models.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

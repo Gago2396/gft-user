@@ -1,4 +1,4 @@
-package com.gfttraining.users.model;
+package com.gfttraining.users.models;
 
 import lombok.Data;
 

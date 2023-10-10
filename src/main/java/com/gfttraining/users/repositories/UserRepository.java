@@ -1,6 +1,6 @@
-package com.gfttraining.users.repository;
+package com.gfttraining.users.repositories;
 
-import com.gfttraining.users.model.User;
+import com.gfttraining.users.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
