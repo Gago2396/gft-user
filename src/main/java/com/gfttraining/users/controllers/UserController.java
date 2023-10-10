@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 public class UserController {
 
@@ -21,5 +23,9 @@ public class UserController {
 
     public ResponseEntity<User> updateUserById(long userId, User updatedUser) {
         return userService.updateUserById(userId, updatedUser);
+    }
+
+    public ResponseEntity<List<User>> loadListOfUsers() {
+        return userService.loadListOfUsers();
     }
 }

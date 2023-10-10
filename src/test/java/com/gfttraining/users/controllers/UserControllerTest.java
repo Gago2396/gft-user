@@ -13,6 +13,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -84,4 +87,21 @@ class UserControllerTest {
         System.out.println("User updated: " + updatedUser.getName());
     }
 
+    @Test
+    @DisplayName("Testing to load a list of Users")
+    void testLoadListOfUsers() {
+        List<User> userList = Arrays.asList(testUser,testUser,testUser);
+
+        when(userService.loadListOfUsers()).thenReturn(new ResponseEntity<>(userList, HttpStatus.OK));
+
+        ResponseEntity<List<User>> responseEntity = userController.loadListOfUsers();
+
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(userList, responseEntity.getBody());
+
+        verify(userService, times(1)).loadListOfUsers();
+
+        System.out.println("Users loaded to DB: " + userList.size());
+    }
 }
