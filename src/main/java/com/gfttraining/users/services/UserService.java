@@ -16,12 +16,12 @@ public class UserService {
     public ResponseEntity<User> createUser(User user) {
         if (isValidUser(user)) {
             try {
-                userRepository.save(user);
-                return new ResponseEntity<>(user, HttpStatus.CREATED);
+                User savedUser = userRepository.save(user);
+                return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
             } catch (Exception e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        }else{
+        } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
