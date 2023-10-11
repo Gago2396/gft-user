@@ -13,6 +13,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -44,10 +47,9 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Testing that a User entity can be created")
+    @DisplayName("Testing that a User can be created")
     void testCreateUser() {
         ResponseEntity<User> expectedResponse = new ResponseEntity<>(testUser, HttpStatus.CREATED);
-
         when(userService.createUser(testUser)).thenReturn(expectedResponse);
 
         ResponseEntity<User> responseEntity = userController.createUser(testUser);
@@ -76,5 +78,48 @@ class UserControllerTest {
         verify(userService, times(1)).deleteUserById(userId);
 
         System.out.println("User deleted with ID: " + userId);
+    }
+
+    @Test
+    @DisplayName("Testing that a User can be updated by a given Id")
+    void testUpdateUserById() {
+        long userId = 1L;
+
+        User updatedUser = new User();
+        updatedUser.setId(userId);
+        updatedUser.setName("Updated John");
+        updatedUser.setLastName("Updated Doe");
+
+        ResponseEntity<User> expectedResponse = new ResponseEntity<>(updatedUser, HttpStatus.OK);
+
+        when(userService.updateUserById(userId, updatedUser)).thenReturn(expectedResponse);
+
+        ResponseEntity<User> responseEntity = userController.updateUserById(userId, updatedUser);
+
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(updatedUser, responseEntity.getBody());
+
+        verify(userService, times(1)).updateUserById(userId, updatedUser);
+
+        System.out.println("User updated: " + updatedUser.getName());
+    }
+
+    @Test
+    @DisplayName("Testing to load a list of Users")
+    void testLoadListOfUsers() {
+        List<User> userList = Arrays.asList(testUser,testUser,testUser);
+
+        when(userService.loadListOfUsers()).thenReturn(new ResponseEntity<>(userList, HttpStatus.OK));
+
+        ResponseEntity<List<User>> responseEntity = userController.loadListOfUsers();
+
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(userList, responseEntity.getBody());
+
+        verify(userService, times(1)).loadListOfUsers();
+
+        System.out.println("Users loaded to DB: " + userList.size());
     }
 }
