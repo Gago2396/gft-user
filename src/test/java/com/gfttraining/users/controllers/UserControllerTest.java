@@ -22,7 +22,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
 
-    @InjectMocks
     private UserController userController;
 
     @Mock
@@ -32,6 +31,7 @@ class UserControllerTest {
 
     @BeforeEach
     void setUp() {
+        userController = new UserController(userService);
         PaymentMethod paymentMethod = new PaymentMethod();
         paymentMethod.setId(1L);
         paymentMethod.setName("Credit Card");
