@@ -63,6 +63,24 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Testing that a User entity can be deleted by ID")
+    void testDeleteUserById() {
+        Long userId = 1L;
+
+        ResponseEntity<User> expectedResponse = new ResponseEntity<>(testUser, HttpStatus.OK);
+
+        when(userService.deleteUserById(userId)).thenReturn(expectedResponse.getBody());
+        ResponseEntity<User> responseEntity = userController.deleteUserById(userId);
+
+        assertEquals(expectedResponse.getStatusCode(), responseEntity.getStatusCode());
+        assertNotNull(responseEntity.getBody());
+
+        verify(userService, times(1)).deleteUserById(userId);
+
+        System.out.println("User deleted with ID: " + userId);
+    }
+
+    @Test
     @DisplayName("Testing that a User can be updated by a given Id")
     void testUpdateUserById() {
         long userId = 1L;
@@ -92,7 +110,6 @@ class UserControllerTest {
     void testLoadListOfUsers() {
         List<User> userList = Arrays.asList(testUser, testUser, testUser);
 
-        // Mock the userService to return the list of users directly
         when(userService.loadListOfUsers()).thenReturn(userList);
 
         ResponseEntity<List<User>> responseEntity = userController.loadListOfUsers();

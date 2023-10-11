@@ -29,10 +29,20 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUserById(@PathVariable long userId, @RequestBody User updatedUser) {
-        User updated = userService.updateUserById(userId, updatedUser);
+    public ResponseEntity<User> updateUserById(@PathVariable long id, @RequestBody User updatedUser) {
+        User updated = userService.updateUserById(id, updatedUser);
         if (updated != null) {
             return ResponseEntity.status(HttpStatus.OK).body(updated);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<User> deleteUserById(@PathVariable long id) {
+        User deleted = userService.deleteUserById(id);
+        if (deleted != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(deleted);
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
