@@ -50,7 +50,7 @@ class UserControllerTest {
     @DisplayName("Testing that a User can be created")
     void testCreateUser() {
         ResponseEntity<User> expectedResponse = new ResponseEntity<>(testUser, HttpStatus.CREATED);
-        when(userService.createUser(testUser)).thenReturn(expectedResponse);
+        when(userService.createUser(testUser)).thenReturn(expectedResponse.getBody());
 
         ResponseEntity<User> responseEntity = userController.createUser(testUser);
 
@@ -69,7 +69,7 @@ class UserControllerTest {
 
         ResponseEntity<User> expectedResponse = new ResponseEntity<>(testUser, HttpStatus.OK);
 
-        when(userService.deleteUserById(userId)).thenReturn(expectedResponse);
+        when(userService.deleteUserById(userId)).thenReturn(expectedResponse.getBody());
         ResponseEntity<User> responseEntity = userController.deleteUserById(userId);
 
         assertEquals(expectedResponse.getStatusCode(), responseEntity.getStatusCode());
@@ -92,7 +92,7 @@ class UserControllerTest {
 
         ResponseEntity<User> expectedResponse = new ResponseEntity<>(updatedUser, HttpStatus.OK);
 
-        when(userService.updateUserById(userId, updatedUser)).thenReturn(expectedResponse);
+        when(userService.updateUserById(userId, updatedUser)).thenReturn(expectedResponse.getBody());
 
         ResponseEntity<User> responseEntity = userController.updateUserById(userId, updatedUser);
 
@@ -108,18 +108,19 @@ class UserControllerTest {
     @Test
     @DisplayName("Testing to load a list of Users")
     void testLoadListOfUsers() {
-        List<User> userList = Arrays.asList(testUser,testUser,testUser);
+        List<User> userList = Arrays.asList(testUser, testUser, testUser);
 
-        when(userService.loadListOfUsers()).thenReturn(new ResponseEntity<>(userList, HttpStatus.OK));
+        when(userService.loadListOfUsers()).thenReturn(userList);
 
         ResponseEntity<List<User>> responseEntity = userController.loadListOfUsers();
 
         assertNotNull(responseEntity);
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
         assertEquals(userList, responseEntity.getBody());
 
         verify(userService, times(1)).loadListOfUsers();
 
         System.out.println("Users loaded to DB: " + userList.size());
     }
+
 }

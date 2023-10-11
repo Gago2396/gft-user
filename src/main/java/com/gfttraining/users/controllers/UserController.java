@@ -2,13 +2,14 @@ package com.gfttraining.users.controllers;
 
 import com.gfttraining.users.models.User;
 import com.gfttraining.users.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
@@ -17,21 +18,43 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/user")
+    @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User user) {
-        return userService.createUser(user);
+        User createdUser = userService.createUser(user);
+        if (createdUser != null) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
-    @DeleteMapping("/users/{id}")
-    public ResponseEntity<User> deleteUserById(@PathVariable Long id) {
-        return userService.deleteUserById(id);
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUserById(@PathVariable long id, @RequestBody User updatedUser) {
+        User updated = userService.updateUserById(id, updatedUser);
+        if (updated != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(updated);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
-    public ResponseEntity<User> updateUserById(long userId, User updatedUser) {
-        return userService.updateUserById(userId, updatedUser);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<User> deleteUserById(@PathVariable long id) {
+        User deleted = userService.deleteUserById(id);
+        if (deleted != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(deleted);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
+    @PostMapping("/load")
     public ResponseEntity<List<User>> loadListOfUsers() {
-        return userService.loadListOfUsers();
+        List<User> users = userService.loadListOfUsers();
+        if (users != null && !users.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(users);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 }

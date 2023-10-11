@@ -1,6 +1,6 @@
 package com.gfttraining.users.models;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -36,59 +36,4 @@ public class User {
     public User() {
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public PaymentMethod getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public void setPaymentMethod(PaymentMethod paymentMethod) {
-        this.paymentMethod = paymentMethod;
-    }
-
-    public int getFidelityPoints() {
-        return fidelityPoints;
-    }
-
-    public void setFidelityPoints(int fidelityPoints) {
-        this.fidelityPoints = fidelityPoints;
-    }
-
-    public double getAveragePurchase() {
-        return averagePurchase;
-    }
-
-    public void setAveragePurchase(double averagePurchase) {
-        this.averagePurchase = averagePurchase;
-    }
 }
