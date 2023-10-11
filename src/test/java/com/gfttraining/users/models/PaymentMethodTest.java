@@ -1,36 +1,38 @@
 package com.gfttraining.users.models;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class PaymentMethodTest {
 
+    private PaymentMethod paymentMethodTest;
+
+    @BeforeEach
+    void setUp(){
+        paymentMethodTest = new PaymentMethod(1L,"Credit Card");
+    }
+
     @Test
     void testGetId() {
-        PaymentMethod paymentMethod = new PaymentMethod();
-        Long id = paymentMethod.getId();
-        assertNull(id);
+        assertEquals(1L, paymentMethodTest.getId());
     }
 
     @Test
     void testGetName() {
-        PaymentMethod paymentMethod = new PaymentMethod();
-        String name = paymentMethod.getName();
-        assertNull(name);
+        assertEquals("Credit Card", paymentMethodTest.getName());
     }
 
     @Test
     void testSetId() {
-        PaymentMethod paymentMethod = new PaymentMethod();
-        paymentMethod.setId(1L);
-        assertEquals(1L, paymentMethod.getId());
+        paymentMethodTest.setId(2L);
+        assertEquals(2L, paymentMethodTest.getId());
     }
 
     @Test
     void testSetName() {
-        PaymentMethod paymentMethod = new PaymentMethod();
-        paymentMethod.setName("Tarjeta de Crédito");
-        assertEquals("Tarjeta de Crédito", paymentMethod.getName());
+        paymentMethodTest.setName("New Payment Method");
+        assertEquals("New Payment Method", paymentMethodTest.getName());
     }
 }
