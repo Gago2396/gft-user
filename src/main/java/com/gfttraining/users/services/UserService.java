@@ -12,8 +12,11 @@ import java.util.List;
 @Service
 public class UserService {
 
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public ResponseEntity<User> createUser(User user) {
         if (isValidUser(user)) {
