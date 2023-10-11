@@ -2,9 +2,6 @@ package com.gfttraining.users.services;
 
 import com.gfttraining.users.models.User;
 import com.gfttraining.users.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,16 +15,15 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public ResponseEntity<User> createUser(User user) {
+    public User createUser(User user) {
         if (isValidUser(user)) {
             try {
-                User savedUser = userRepository.save(user);
-                return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+                return userRepository.save(user);
             } catch (Exception e) {
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                return null;
             }
         } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return null;
         }
     }
 
@@ -38,11 +34,13 @@ public class UserService {
                 user.getPaymentMethod() == null;
     }
 
-    public ResponseEntity<User> updateUserById(long userId, User updatedUser) {
+    public User updateUserById(long userId, User updatedUser) {
+        // ToDo: Implement update logic here and return the updated user
         return null;
     }
 
-    public ResponseEntity<List<User>> loadListOfUsers() {
+    public List<User> loadListOfUsers() {
+        // ToDo: Implement logic to load and return the list of users
         return null;
     }
 }
