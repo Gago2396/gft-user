@@ -2,6 +2,7 @@ package com.gfttraining.users.controllers;
 
 import com.gfttraining.users.models.User;
 import com.gfttraining.users.services.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,9 +22,9 @@ public class UserController {
     public ResponseEntity<User> createUser(@RequestBody User user) {
         User createdUser = userService.createUser(user);
         if (createdUser != null) {
-            return ResponseEntity.ok(createdUser);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
         } else {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
@@ -31,9 +32,9 @@ public class UserController {
     public ResponseEntity<User> updateUserById(@PathVariable long userId, @RequestBody User updatedUser) {
         User updated = userService.updateUserById(userId, updatedUser);
         if (updated != null) {
-            return ResponseEntity.ok(updated);
+            return ResponseEntity.status(HttpStatus.OK).body(updated);
         } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
@@ -41,9 +42,9 @@ public class UserController {
     public ResponseEntity<List<User>> loadListOfUsers() {
         List<User> users = userService.loadListOfUsers();
         if (users != null && !users.isEmpty()) {
-            return ResponseEntity.ok(users);
+            return ResponseEntity.status(HttpStatus.CREATED).body(users);
         } else {
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 }
