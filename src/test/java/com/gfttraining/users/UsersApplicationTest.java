@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class UsersApplicationTest {
 
     @Test
-    void testNoExceptionInExecution() {
+    void testMainApplication() {
         assertDoesNotThrow(() -> UsersApplication.main(new String[]{}));
     }
 }

@@ -63,6 +63,21 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Testing that a User entity can give a INTERNAL_SERVER_ERROR while creating a USER")
+    void testCreateUserError() {
+        when(userService.createUser(testUser)).thenReturn(null);
+
+        ResponseEntity<User> responseEntity = userController.createUser(testUser);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+        assertNull(responseEntity.getBody());
+
+        verify(userService, times(1)).createUser(testUser);
+
+        System.out.println("User creation failed as expected.");
+    }
+
+    @Test
     @DisplayName("Testing that a User entity can be deleted by ID")
     void testDeleteUserById() {
         Long userId = 1L;
@@ -78,6 +93,22 @@ class UserControllerTest {
         verify(userService, times(1)).deleteUserById(userId);
 
         System.out.println("User deleted with ID: " + userId);
+    }
+
+    @Test
+    @DisplayName("Testing that a User entity can give a INTERNAL_SERVER_ERROR while deleting a USER")
+    void testDeleteUserByIdError() {
+        Long userId = 1L;
+        when(userService.deleteUserById(userId)).thenReturn(null);
+
+        ResponseEntity<User> responseEntity = userController.deleteUserById(userId);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+        assertNull(responseEntity.getBody());
+
+        verify(userService, times(1)).deleteUserById(userId);
+
+        System.out.println("User deletion failed as expected.");
     }
 
     @Test
@@ -106,6 +137,24 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Testing that a User entity can give a INTERNAL_SERVER_ERROR while deleting a USER")
+    void testUpdateUserByIdError() {
+        long userId = 1L;
+        User updatedUser = new User();
+
+        when(userService.updateUserById(userId, updatedUser)).thenReturn(null);
+
+        ResponseEntity<User> responseEntity = userController.updateUserById(userId, updatedUser);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+        assertNull(responseEntity.getBody());
+
+        verify(userService, times(1)).updateUserById(userId, updatedUser);
+
+        System.out.println("User update failed as expected.");
+    }
+
+    @Test
     @DisplayName("Testing to load a list of Users")
     void testLoadListOfUsers() {
         List<User> userList = Arrays.asList(testUser, testUser, testUser);
@@ -121,6 +170,21 @@ class UserControllerTest {
         verify(userService, times(1)).loadListOfUsers();
 
         System.out.println("Users loaded to DB: " + userList.size());
+    }
+
+    @Test
+    @DisplayName("Testing that a User entity can give a INTERNAL_SERVER_ERROR while loading a list of USERS")
+    void testLoadListOfUsersError() {
+        when(userService.loadListOfUsers()).thenReturn(null);
+
+        ResponseEntity<List<User>> responseEntity = userController.loadListOfUsers();
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+        assertNull(responseEntity.getBody());
+
+        verify(userService, times(1)).loadListOfUsers();
+
+        System.out.println("Loading users failed as expected.");
     }
 
 }
