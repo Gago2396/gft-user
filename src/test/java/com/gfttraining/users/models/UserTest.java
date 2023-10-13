@@ -1,5 +1,6 @@
 package com.gfttraining.users.models;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -7,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserTest {
 
     @Test
+    @DisplayName("Set variables in User constructor")
     void constructorShouldSetValues() {
         Long id = 1L;
         String name = "John";
@@ -28,6 +30,7 @@ class UserTest {
     }
 
     @Test
+    @DisplayName("Test getId() in User")
     void getId() {
         User user = new User();
         Long id = user.getId();
@@ -35,6 +38,7 @@ class UserTest {
     }
 
     @Test
+    @DisplayName("Test getName() in User")
     void getName() {
         User user = new User();
         String name = user.getName();
@@ -42,6 +46,7 @@ class UserTest {
     }
 
     @Test
+    @DisplayName("Test getLastName() in User")
     void getLastName() {
         User user = new User();
         String lastName = user.getLastName();
@@ -49,6 +54,7 @@ class UserTest {
     }
 
     @Test
+    @DisplayName("Test getAddress() in User")
     void getAddress() {
         User user = new User();
         String address = user.getAddress();
@@ -56,6 +62,7 @@ class UserTest {
     }
 
     @Test
+    @DisplayName("Test getPaymentMethod() in User")
     void getPaymentMethod() {
         User user = new User();
         PaymentMethod paymentMethod = user.getPaymentMethod();
@@ -63,6 +70,7 @@ class UserTest {
     }
 
     @Test
+    @DisplayName("Test getFidelityPoints() in User")
     void getFidelityPoints() {
         User user = new User();
         int fidelityPoints = user.getFidelityPoints();
@@ -70,6 +78,7 @@ class UserTest {
     }
 
     @Test
+    @DisplayName("Test getAveragePurchase() in User")
     void getAveragePurchase() {
         User user = new User();
         double averagePurchase = user.getAveragePurchase();
@@ -77,6 +86,7 @@ class UserTest {
     }
 
     @Test
+    @DisplayName("Test setId() in User")
     void setId() {
         User user = new User();
         user.setId(1L);
@@ -84,6 +94,7 @@ class UserTest {
     }
 
     @Test
+    @DisplayName("Test setName() in User")
     void setName() {
         User user = new User();
         user.setName("John");
@@ -91,6 +102,7 @@ class UserTest {
     }
 
     @Test
+    @DisplayName("Test setLastName() in User")
     void setLastName() {
         User user = new User();
         user.setLastName("Doe");
@@ -98,6 +110,7 @@ class UserTest {
     }
 
     @Test
+    @DisplayName("Test setAddress() in User")
     void setAddress() {
         User user = new User();
         user.setAddress("123 Main St");
@@ -105,6 +118,7 @@ class UserTest {
     }
 
     @Test
+    @DisplayName("Test setPaymentMethod() in User")
     void setPaymentMethod() {
         User user = new User();
         PaymentMethod paymentMethod = new PaymentMethod();
@@ -113,6 +127,7 @@ class UserTest {
     }
 
     @Test
+    @DisplayName("Test setFidelityPoints() in User")
     void setFidelityPoints() {
         User user = new User();
         user.setFidelityPoints(100);
@@ -120,6 +135,7 @@ class UserTest {
     }
 
     @Test
+    @DisplayName("Test setAveragePurchase() in User")
     void setAveragePurchase() {
         User user = new User();
         user.setAveragePurchase(50.0);
