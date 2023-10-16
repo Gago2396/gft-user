@@ -129,13 +129,13 @@ paths:
                   loyalty_points: 20
                   average_purchase: 50.0
 
-  /users/search:
+  /users/search/{name}:
     get:
       summary: Search user by name
       tags:
         - Search
       parameters:
-        - in: query
+        - in: path
           name: name
           required: true
           schema:
@@ -172,7 +172,7 @@ paths:
                     id: 789
                     loyalty_points: 30
                     average_purchase: 40.0
-                  - name: "John"
+                  - name: "Anna"
                     last_name: "Doe"
                     address: "123 Street"
                     payment_method: "Visa"
