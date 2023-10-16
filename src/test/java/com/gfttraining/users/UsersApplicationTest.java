@@ -9,7 +9,7 @@ class UsersApplicationTest {
 
     @Test
     @DisplayName("Execution of main method")
-    void testNoExceptionInExecution() {
+    void testMainApplication() {
         assertDoesNotThrow(() -> UsersApplication.main(new String[]{}));
     }
 }
