@@ -1,7 +1,11 @@
 package com.gfttraining.users.services;
 
+import com.gfttraining.users.models.PaymentMethod;
 import com.gfttraining.users.models.User;
+import com.gfttraining.users.models.UserRequest;
+import com.gfttraining.users.repositories.PaymentMethodRepository;
 import com.gfttraining.users.repositories.UserRepository;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,31 +16,38 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
+    private final PaymentMethodRepository paymentMethodRepository;
+
+    public UserService(UserRepository userRepository, PaymentMethodRepository paymentMethodRepository) {
         this.userRepository = userRepository;
+        this.paymentMethodRepository = paymentMethodRepository;
     }
 
-    public User createUser(User user) {
-        if (isValidUser(user)) {
-            try {
-                return userRepository.save(user);
-            } catch (Exception e) {
-                return null;
-            }
-        } else {
+    public User createUser(UserRequest userRequest) {
+
+        try {
+            PaymentMethod paymentMethod = paymentMethodRepository
+                    .findByName(userRequest.getPaymentMethod())
+                    //ToDo: Control negative if payment does not exist
+                    .orElseThrow(ChangeSetPersister.NotFoundException::new);
+
+            User user = new User();
+            user.setName(userRequest.getName());
+            user.setLastName(userRequest.getLastName());
+            user.setAddress(userRequest.getAddress());
+            user.setFidelityPoints(userRequest.getFidelityPoints());
+            user.setAveragePurchase(userRequest.getAveragePurchase());
+            user.setPaymentMethod(paymentMethod);
+
+            return userRepository.save(user);
+
+        } catch (Exception e) {
             return null;
         }
     }
 
     public User deleteUserById(Long id) {
         return null;
-    }
-
-    private boolean isValidUser(User user) {
-        return user == null || user.getName() == null || user.getName().isEmpty() ||
-                user.getLastName() == null || user.getLastName().isEmpty() ||
-                user.getAddress() == null || user.getAddress().isEmpty() ||
-                user.getPaymentMethod() == null;
     }
 
     public User updateUserById(long userId, User updatedUser) {

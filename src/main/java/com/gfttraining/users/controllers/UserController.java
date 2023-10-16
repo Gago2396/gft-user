@@ -1,6 +1,7 @@
 package com.gfttraining.users.controllers;
 
 import com.gfttraining.users.models.User;
+import com.gfttraining.users.models.UserRequest;
 import com.gfttraining.users.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,12 +22,11 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody @Valid User user) {
+    public ResponseEntity<User> createUser(@RequestBody @Valid UserRequest userRequest) {
         return new ResponseEntity<>(
-            userService.createUser(user),
+            userService.createUser(userRequest),
             HttpStatus.OK
         );
-
     }
 
     @PutMapping("/{id}")
