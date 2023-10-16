@@ -9,7 +9,7 @@ class UserTest {
 
     @Test
     @DisplayName("Set variables in User constructor")
-    void constructorShouldSetValues() {
+    void testUserConstructor() {
         Long id = 1L;
         String name = "John";
         String lastName = "Doe";
