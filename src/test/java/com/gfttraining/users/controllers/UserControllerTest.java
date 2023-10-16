@@ -94,7 +94,7 @@ class UserControllerTest {
 
         when(userService.updateUserById(userId, updatedUser)).thenReturn(expectedResponse.getBody());
 
-        ResponseEntity<User> responseEntity = userController.updateUserById(userId, updatedUser);
+        ResponseEntity<?> responseEntity = userController.updateUserById(userId, updatedUser);
 
         assertNotNull(responseEntity);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());

@@ -1,5 +1,6 @@
 package com.gfttraining.users.controllers;
 
+import com.gfttraining.users.exceptions.ErrorResponse;
 import com.gfttraining.users.models.User;
 import com.gfttraining.users.services.UserService;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @CrossOrigin(origins = "http://localhost:4200")
+//    @CrossOrigin(origins = "http://localhost:4200")
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User user) {
         User createdUser = userService.createUser(user);
@@ -29,13 +30,14 @@ public class UserController {
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<User> updateUserById(@PathVariable long id, @RequestBody User updatedUser) {
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateUserById(@PathVariable long id, @RequestBody User updatedUser) {
         User updated = userService.updateUserById(id, updatedUser);
         if (updated != null) {
             return ResponseEntity.status(HttpStatus.OK).body(updated);
         } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            ErrorResponse errorResponse = new ErrorResponse("User not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         }
     }
 
