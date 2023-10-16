@@ -112,7 +112,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Testing that a User can be updated by a given Id")
+    @DisplayName("Update User by id")
     void testUpdateUserById() {
         long userId = 1L;
 

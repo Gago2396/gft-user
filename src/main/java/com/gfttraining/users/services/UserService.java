@@ -38,11 +38,15 @@ public class UserService {
                 user.getPaymentMethod() == null;
     }
 
-    public User updateUserById(long userId, User updatedUser) {
-        // ToDo: Implement update logic here and return the updated user
-        return null;
-    }
+    public User updateUserById(long id, User updatedUser) {
+        if (!userRepository.existsById(id)) {
+            throw new RuntimeException("User not found with id: " + id);
+        }
 
+        updatedUser.setId(id);
+
+        return userRepository.save(updatedUser);
+    }
     public List<User> loadListOfUsers() {
         // ToDo: Implement logic to load and return the list of users
         return null;
