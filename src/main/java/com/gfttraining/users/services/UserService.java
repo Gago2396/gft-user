@@ -43,8 +43,7 @@ public class UserService {
         return null;
     }
 
-    public List<User> loadListOfUsers() {
-        // ToDo: Implement logic to load and return the list of users
-        return null;
+    public List<User> loadListOfUsers(List<User> userList) {
+        return userRepository.saveAll(userList);
     }
 }

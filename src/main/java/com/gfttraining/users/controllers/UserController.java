@@ -50,10 +50,10 @@ public class UserController {
     }
 
     @PostMapping("/load")
-    public ResponseEntity<List<User>> loadListOfUsers() {
-        List<User> users = userService.loadListOfUsers();
-        if (users != null && !users.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(users);
+    public ResponseEntity<List<User>> loadListOfUsers(@RequestBody List<User> userList) {
+        List<User> savedUsers = userService.loadListOfUsers(userList);
+        if (savedUsers != null && !savedUsers.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedUsers);
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }

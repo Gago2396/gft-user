@@ -159,15 +159,15 @@ class UserControllerTest {
     void testLoadListOfUsers() {
         List<User> userList = Arrays.asList(testUser, testUser, testUser);
 
-        when(userService.loadListOfUsers()).thenReturn(userList);
+        when(userService.loadListOfUsers(userList)).thenReturn(userList);
 
-        ResponseEntity<List<User>> responseEntity = userController.loadListOfUsers();
+        ResponseEntity<List<User>> responseEntity = userController.loadListOfUsers(userList);
 
         assertNotNull(responseEntity);
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
         assertEquals(userList, responseEntity.getBody());
 
-        verify(userService, times(1)).loadListOfUsers();
+        verify(userService, times(1)).loadListOfUsers(userList);
 
         System.out.println("Users loaded to DB: " + userList.size());
     }
@@ -175,14 +175,16 @@ class UserControllerTest {
     @Test
     @DisplayName("Testing that a User entity can give a INTERNAL_SERVER_ERROR while loading a list of USERS")
     void testLoadListOfUsersError() {
-        when(userService.loadListOfUsers()).thenReturn(null);
+        List<User> userList = Arrays.asList(testUser, testUser, testUser);
 
-        ResponseEntity<List<User>> responseEntity = userController.loadListOfUsers();
+        when(userService.loadListOfUsers(userList)).thenReturn(null);
+
+        ResponseEntity<List<User>> responseEntity = userController.loadListOfUsers(userList);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
         assertNull(responseEntity.getBody());
 
-        verify(userService, times(1)).loadListOfUsers();
+        verify(userService, times(1)).loadListOfUsers(userList);
 
         System.out.println("Loading users failed as expected.");
     }
