@@ -13,7 +13,7 @@ tags:
 paths:
   /users:
     post:
-      summary: User creation
+      summary: User registration
       tags:
         - Management
       requestBody:
@@ -89,7 +89,7 @@ paths:
           description: User deleted successfully
 
     get:
-      summary: Search user by ID
+      summary: Find user by ID
       tags:
         - Search
       parameters:
@@ -121,9 +121,9 @@ paths:
                   average_purchase:
                     type: number
                 example:
-                  name: "Juan"
-                  last_name: "Pérez"
-                  address: "Street 123"
+                  name: "John"
+                  last_name: "Doe"
+                  address: "123 Street"
                   payment_method: "Visa"
                   id: 456
                   loyalty_points: 20
@@ -165,16 +165,16 @@ paths:
                     average_purchase:
                       type: number
                 example:
-                  - name: "Ana"
-                    last_name: "García"
-                    address: "Avenue 456"
+                  - name: "Anna"
+                    last_name: "Smith"
+                    address: "456 Avenue"
                     payment_method: "Paypal"
                     id: 789
                     loyalty_points: 30
                     average_purchase: 40.0
-                  - name: "Juan"
-                    last_name: "Pérez"
-                    address: "Street 123"
+                  - name: "John"
+                    last_name: "Doe"
+                    address: "123 Street"
                     payment_method: "Visa"
                     id: 456
                     loyalty_points: 20
@@ -210,24 +210,24 @@ paths:
                     average_purchase:
                       type: number
                 example:
-                  - name: "Ana"
-                    last_name: "García"
-                    address: "Avenue 456"
+                  - name: "Anna"
+                    last_name: "Smith"
+                    address: "456 Avenue"
                     payment_method: "Paypal"
                     id: 789
                     loyalty_points: 30
                     average_purchase: 40.0
-                  - name: "Juan"
-                    last_name: "Pérez"
-                    address: "Street 123"
+                  - name: "John"
+                    last_name: "Doe"
+                    address: "123 Street"
                     payment_method: "Visa"
                     id: 456
                     loyalty_points: 20
                     average_purchase: 50.0
 
-  /users/upload:
+  /users/load:
     post:
-      summary: Upload list of users
+      summary: Load list of users
       tags:
         - Search
       requestBody:
@@ -249,11 +249,11 @@ paths:
                     type: string
       responses:
         '201':
-          description: List of users uploaded successfully
+          description: List of users loaded successfully
           content:
             application/json:
               example:
-                message: "List of users uploaded successfully"
+                message: "List of users loaded successfully"
 
   /users/favorite:
     post:
