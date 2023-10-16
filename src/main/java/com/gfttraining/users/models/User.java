@@ -20,8 +20,8 @@ public class User {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "payment_method_id")
     private PaymentMethod paymentMethod;
-    private int fidelityPoints;
-    private double averagePurchase;
+    private Integer fidelityPoints;
+    private Double averagePurchase;
 
     public User(Long id, String name, String lastName, String address, PaymentMethod paymentMethod, int fidelityPoints, double averagePurchase) {
         this.id = id;
