@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserTest {
 
     @Test
-    void constructorShouldSetValues() {
+    void testUserConstructor() {
         Long id = 1L;
         String name = "John";
         String lastName = "Doe";
