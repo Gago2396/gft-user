@@ -28,8 +28,8 @@ public class User {
     @JoinColumn(name = "payment_method_id")
     private PaymentMethod paymentMethod;
 
-    private int fidelityPoints;
+    private Integer fidelityPoints;
 
-    private double averagePurchase;
+    private Double averagePurchase;
 
 }
