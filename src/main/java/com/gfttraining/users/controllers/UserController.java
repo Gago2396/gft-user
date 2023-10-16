@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -18,15 +19,13 @@ public class UserController {
         this.userService = userService;
     }
 
-    @CrossOrigin(origins = "http://localhost:4200")
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        User createdUser = userService.createUser(user);
-        if (createdUser != null) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
-        } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+    public ResponseEntity<User> createUser(@RequestBody @Valid User user) {
+        return new ResponseEntity<>(
+            userService.createUser(user),
+            HttpStatus.OK
+        );
+
     }
 
     @PutMapping("/{id}")
