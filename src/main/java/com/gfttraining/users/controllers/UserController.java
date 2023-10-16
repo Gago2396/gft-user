@@ -71,8 +71,8 @@ public class UserController {
     }
 
     @GetMapping("/search/{name}")
-    public ResponseEntity<User> getUserByName(@PathVariable String name) {
-        Optional<User> user = userService.getUserByName(name);
+    public ResponseEntity<List<User>> getUserByName(@PathVariable String name) {
+        Optional<List<User>> user = userService.getUserByName(name);
         return user.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 }

@@ -52,7 +52,7 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public Optional<User> getUserByName(String name) {
+    public Optional<List<User>> getUserByName(String name) {
         return userRepository.findByName(name);
     }
 }
