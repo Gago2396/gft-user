@@ -1,5 +1,6 @@
 package com.gfttraining.users.controllers;
 
+import com.gfttraining.users.models.Favorite;
 import com.gfttraining.users.models.User;
 import com.gfttraining.users.services.UserService;
 import org.springframework.http.HttpStatus;
@@ -35,7 +36,7 @@ public class UserController {
         if (updated != null) {
             return ResponseEntity.status(HttpStatus.OK).body(updated);
         } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 
@@ -63,11 +64,7 @@ public class UserController {
     public ResponseEntity<User> getUserById(@PathVariable long id) {
         Optional<User> user = userService.getUserById(id);
 
-        if (user.isPresent()) {
-            return new ResponseEntity<>(user.get(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return user.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @GetMapping("/search/{name}")
@@ -75,4 +72,5 @@ public class UserController {
         Optional<List<User>> user = userService.getUserByName(name);
         return user.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+
 }

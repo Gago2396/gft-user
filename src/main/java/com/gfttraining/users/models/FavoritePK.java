@@ -1,21 +1,13 @@
 package com.gfttraining.users.models;
 
-import javax.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 
-@Embeddable
 public class FavoritePK implements Serializable {
 
-    private User user;
+    private Long user;
 
-    private long productId;
-
-    public FavoritePK(User user, long productId) {
-        super();
-        this.user = user;
-        this.productId = productId;
-    }
+    private Long productId;
 
     @Override
     public boolean equals(Object o) {
@@ -30,4 +22,5 @@ public class FavoritePK implements Serializable {
     public int hashCode() {
         return Objects.hash(user, productId);
     }
+
 }
