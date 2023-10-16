@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -32,6 +33,7 @@ class UserControllerTest {
     @BeforeEach
     void setUp() {
         userController = new UserController(userService);
+
         PaymentMethod paymentMethod = new PaymentMethod();
         paymentMethod.setId(1L);
         paymentMethod.setName("Credit Card");
@@ -78,6 +80,23 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Get User by id")
+    void testGetUserById() {
+        long userId = 1L;
+
+        when(userService.getUserById(userId)).thenReturn(Optional.of(testUser));
+
+        ResponseEntity<User> responseEntity = userController.getUserById(userId);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(testUser, responseEntity.getBody());
+
+        verify(userService, times(1)).getUserById(userId);
+
+        System.out.println("User found by ID: " + testUser.getId());
+    }
+
+    @Test
     @DisplayName("Testing that a User entity can be deleted by ID")
     void testDeleteUserById() {
         Long userId = 1L;
@@ -112,7 +131,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Testing that a User can be updated by a given Id")
+    @DisplayName("Update User by id")
     void testUpdateUserById() {
         long userId = 1L;
 

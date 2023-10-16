@@ -5,6 +5,7 @@ import com.gfttraining.users.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -27,7 +28,7 @@ public class UserService {
         }
     }
 
-    public User deleteUserById(Long id){
+    public User deleteUserById(Long id) {
         return null;
     }
 
@@ -45,5 +46,9 @@ public class UserService {
 
     public List<User> loadListOfUsers(List<User> userList) {
         return userRepository.saveAll(userList);
+    }
+
+    public Optional<User> getUserById(long id) {
+        return userRepository.findById(id);
     }
 }
