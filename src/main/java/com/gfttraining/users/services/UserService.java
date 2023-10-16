@@ -5,6 +5,7 @@ import com.gfttraining.users.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -27,7 +28,7 @@ public class UserService {
         }
     }
 
-    public User deleteUserById(Long id){
+    public User deleteUserById(Long id) {
         return null;
     }
 
@@ -39,12 +40,31 @@ public class UserService {
     }
 
     public User updateUserById(long userId, User updatedUser) {
-        // ToDo: Implement update logic here and return the updated user
-        return null;
+        return userRepository.findById(userId)
+                .map(existingUser -> {
+                    Optional.ofNullable(updatedUser.getName()).ifPresent(existingUser::setName);
+                    Optional.ofNullable(updatedUser.getLastName()).ifPresent(existingUser::setLastName);
+                    Optional.ofNullable(updatedUser.getAddress()).ifPresent(existingUser::setAddress);
+                    Optional.ofNullable(updatedUser.getPaymentMethod()).ifPresent(existingUser::setPaymentMethod);
+                    Optional.ofNullable(updatedUser.getFidelityPoints()).ifPresent(existingUser::setFidelityPoints);
+                    Optional.ofNullable(updatedUser.getAveragePurchase()).ifPresent(existingUser::setAveragePurchase);
+
+                    userRepository.save(existingUser);
+
+                    return userRepository.findById(userId).get();
+                })
+                .orElse(null);
     }
 
-    public List<User> loadListOfUsers() {
-        // ToDo: Implement logic to load and return the list of users
-        return null;
+    public List<User> loadListOfUsers(List<User> userList) {
+        return userRepository.saveAll(userList);
+    }
+
+    public Optional<User> getUserById(long id) {
+        return userRepository.findById(id);
+    }
+
+    public Optional<List<User>> getUserByName(String name) {
+        return userRepository.findByName(name);
     }
 }
