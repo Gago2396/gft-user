@@ -40,8 +40,20 @@ public class UserService {
     }
 
     public User updateUserById(long userId, User updatedUser) {
-        // ToDo: Implement update logic here and return the updated user
-        return null;
+        return userRepository.findById(userId)
+                .map(existingUser -> {
+                    Optional.ofNullable(updatedUser.getName()).ifPresent(existingUser::setName);
+                    Optional.ofNullable(updatedUser.getLastName()).ifPresent(existingUser::setLastName);
+                    Optional.ofNullable(updatedUser.getAddress()).ifPresent(existingUser::setAddress);
+                    Optional.ofNullable(updatedUser.getPaymentMethod()).ifPresent(existingUser::setPaymentMethod);
+                    Optional.ofNullable(updatedUser.getFidelityPoints()).ifPresent(existingUser::setFidelityPoints);
+                    Optional.ofNullable(updatedUser.getAveragePurchase()).ifPresent(existingUser::setAveragePurchase);
+
+                    userRepository.save(existingUser);
+
+                    return userRepository.findById(userId).get();
+                })
+                .orElse(null);
     }
 
     public List<User> loadListOfUsers(List<User> userList) {
