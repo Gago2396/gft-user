@@ -7,7 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -21,16 +23,15 @@ public class UserController {
 
 //    @CrossOrigin(origins = "http://localhost:4200")
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        User createdUser = userService.createUser(user);
-        if (createdUser != null) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
-        } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+    public ResponseEntity<User> createUser(@RequestBody @Valid User user) {
+        return new ResponseEntity<>(
+            userService.createUser(user),
+            HttpStatus.OK
+        );
+
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateUserById(@PathVariable long id, @RequestBody User updatedUser) {
         User updated = userService.updateUserById(id, updatedUser);
         if (updated != null) {
@@ -52,12 +53,29 @@ public class UserController {
     }
 
     @PostMapping("/load")
-    public ResponseEntity<List<User>> loadListOfUsers() {
-        List<User> users = userService.loadListOfUsers();
-        if (users != null && !users.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(users);
+    public ResponseEntity<List<User>> loadListOfUsers(@RequestBody List<User> userList) {
+        List<User> savedUsers = userService.loadListOfUsers(userList);
+        if (savedUsers != null && !savedUsers.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedUsers);
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable long id) {
+        Optional<User> user = userService.getUserById(id);
+
+        if (user.isPresent()) {
+            return new ResponseEntity<>(user.get(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/search/{name}")
+    public ResponseEntity<List<User>> getUserByName(@PathVariable String name) {
+        Optional<List<User>> user = userService.getUserByName(name);
+        return user.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 }

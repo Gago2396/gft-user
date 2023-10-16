@@ -1,12 +1,16 @@
 package com.gfttraining.users.models;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "payment_methods")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class PaymentMethod {
 
     @Id
@@ -15,11 +19,4 @@ public class PaymentMethod {
 
     private String name;
 
-    public PaymentMethod(Long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public PaymentMethod() {
-    }
 }

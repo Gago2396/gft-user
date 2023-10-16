@@ -28,7 +28,7 @@ public class UserService {
         }
     }
 
-    public User deleteUserById(Long id){
+    public User deleteUserById(Long id) {
         return null;
     }
 
@@ -56,8 +56,15 @@ public class UserService {
                 .orElse(null);
     }
 
-    public List<User> loadListOfUsers() {
-        // ToDo: Implement logic to load and return the list of users
-        return null;
+    public List<User> loadListOfUsers(List<User> userList) {
+        return userRepository.saveAll(userList);
+    }
+
+    public Optional<User> getUserById(long id) {
+        return userRepository.findById(id);
+    }
+
+    public Optional<List<User>> getUserByName(String name) {
+        return userRepository.findByName(name);
     }
 }
