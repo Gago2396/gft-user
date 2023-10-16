@@ -1,0 +1,6 @@
+spring:
+  profiles:
+    active: dev
+  config:
+    name: application
+    location: classpath:/,classpath:/config/,file:./config/
