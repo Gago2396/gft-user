@@ -24,12 +24,12 @@ public class User {
     private String address;
 
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "payment_method_id")
+    @ManyToOne
+    @JoinColumn
     private PaymentMethod paymentMethod;
 
-    private int fidelityPoints;
+    private Integer fidelityPoints;
 
-    private double averagePurchase;
+    private Double averagePurchase;
 
 }
