@@ -57,8 +57,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Agrega las dependencias de OpenAPI -->
-		<!-- Por ejemplo, para Springfox -->
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-spring-web</artifactId>

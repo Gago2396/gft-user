@@ -24,8 +24,8 @@ public class User {
     private String address;
 
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "payment_method_id")
+    @ManyToOne
+    @JoinColumn
     private PaymentMethod paymentMethod;
 
     private Integer fidelityPoints;

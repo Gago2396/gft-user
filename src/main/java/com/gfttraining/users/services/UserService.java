@@ -1,5 +1,6 @@
 package com.gfttraining.users.services;
 
+import com.gfttraining.users.models.Favorite;
 import com.gfttraining.users.models.PaymentMethod;
 import com.gfttraining.users.models.User;
 import com.gfttraining.users.models.UserRequest;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -71,7 +73,8 @@ public class UserService {
 
                     userRepository.save(existingUser);
 
-                    return userRepository.findById(userId).get();
+                    return userRepository.findById(userId)
+                            .orElseThrow(() -> new NoSuchElementException("User not found"));
                 })
                 .orElse(null);
     }
@@ -105,5 +108,9 @@ public class UserService {
 
     public Optional<List<User>> getUserByName(String name) {
         return userRepository.findByName(name);
+    }
+
+    public Favorite addFavorite(Favorite favorite) {
+        return null;
     }
 }
