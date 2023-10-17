@@ -26,7 +26,7 @@ public class UserController {
     public ResponseEntity<User> createUser(@RequestBody @Valid UserRequest userRequest) {
         return new ResponseEntity<>(
             userService.createUser(userRequest),
-            HttpStatus.OK
+            HttpStatus.CREATED
         );
     }
 
