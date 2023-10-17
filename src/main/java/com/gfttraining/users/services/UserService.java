@@ -42,21 +42,11 @@ public class UserService {
     }
 
     public User updateUserById(long userId, User updatedUser) {
-        return userRepository.findById(userId)
-                .map(existingUser -> {
-                    Optional.ofNullable(updatedUser.getName()).ifPresent(existingUser::setName);
-                    Optional.ofNullable(updatedUser.getLastName()).ifPresent(existingUser::setLastName);
-                    Optional.ofNullable(updatedUser.getAddress()).ifPresent(existingUser::setAddress);
-                    Optional.ofNullable(updatedUser.getPaymentMethod()).ifPresent(existingUser::setPaymentMethod);
-                    Optional.ofNullable(updatedUser.getFidelityPoints()).ifPresent(existingUser::setFidelityPoints);
-                    Optional.ofNullable(updatedUser.getAveragePurchase()).ifPresent(existingUser::setAveragePurchase);
+        userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User not found"));
+        updatedUser.setId(userId);
 
-                    userRepository.save(existingUser);
-
-                    return userRepository.findById(userId)
-                            .orElseThrow(() -> new NoSuchElementException("User not found"));
-                })
-                .orElse(null);
+        return userRepository.save(updatedUser);
     }
 
     public List<User> loadListOfUsers(List<User> userList) {
