@@ -8,6 +8,7 @@ import com.gfttraining.users.repositories.UserRepository;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,13 +24,66 @@ public class UserService {
         this.paymentMethodRepository = paymentMethodRepository;
     }
 
-    public User createUser(UserRequest userRequest) {
-
+    public PaymentMethod findPaymentMethod(String paymentMethodName) {
         try {
             PaymentMethod paymentMethod = paymentMethodRepository
-                    .findByName(userRequest.getPaymentMethod())
+                    .findByName(paymentMethodName)
                     //ToDo: Control negative if payment does not exist
                     .orElseThrow(ChangeSetPersister.NotFoundException::new);
+            return paymentMethod;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public User createUser(UserRequest userRequest) {
+
+        PaymentMethod paymentMethod = findPaymentMethod(userRequest.getPaymentMethod());
+
+        User user = new User();
+        user.setName(userRequest.getName());
+        user.setLastName(userRequest.getLastName());
+        user.setAddress(userRequest.getAddress());
+        user.setFidelityPoints(userRequest.getFidelityPoints());
+        user.setAveragePurchase(userRequest.getAveragePurchase());
+        user.setPaymentMethod(paymentMethod);
+
+        return userRepository.save(user);
+
+    }
+
+    public User deleteUserById(Long id) {
+        return null;
+    }
+
+    public User updateUserById(long userId, UserRequest updatedUserRequest) {
+
+        PaymentMethod paymentMethod = findPaymentMethod(updatedUserRequest.getPaymentMethod());
+
+        return userRepository.findById(userId)
+                .map(existingUser -> {
+                    Optional.ofNullable(updatedUserRequest.getName()).ifPresent(existingUser::setName);
+                    Optional.ofNullable(updatedUserRequest.getLastName()).ifPresent(existingUser::setLastName);
+                    Optional.ofNullable(updatedUserRequest.getAddress()).ifPresent(existingUser::setAddress);
+                    Optional.ofNullable(paymentMethod).ifPresent(existingUser::setPaymentMethod);
+                    Optional.ofNullable(updatedUserRequest.getFidelityPoints()).ifPresent(existingUser::setFidelityPoints);
+                    Optional.ofNullable(updatedUserRequest.getAveragePurchase()).ifPresent(existingUser::setAveragePurchase);
+
+                    userRepository.save(existingUser);
+
+                    return userRepository.findById(userId).get();
+                })
+                .orElse(null);
+    }
+
+    public List<User> loadListOfUsers(List<UserRequest> userRequestList) {
+
+        List<User> usersToLoad = new ArrayList<>();
+
+        //ToDo: Manejar userRequest nulo
+        for (UserRequest userRequest : userRequestList) {
+            //ToDo: Manejar paymentMethod nulo
+            PaymentMethod paymentMethod = findPaymentMethod(userRequest.getPaymentMethod());
 
             User user = new User();
             user.setName(userRequest.getName());
@@ -39,36 +93,10 @@ public class UserService {
             user.setAveragePurchase(userRequest.getAveragePurchase());
             user.setPaymentMethod(paymentMethod);
 
-            return userRepository.save(user);
-
-        } catch (Exception e) {
-            return null;
+            usersToLoad.add(user);
         }
-    }
 
-    public User deleteUserById(Long id) {
-        return null;
-    }
-
-    public User updateUserById(long userId, User updatedUser) {
-        return userRepository.findById(userId)
-                .map(existingUser -> {
-                    Optional.ofNullable(updatedUser.getName()).ifPresent(existingUser::setName);
-                    Optional.ofNullable(updatedUser.getLastName()).ifPresent(existingUser::setLastName);
-                    Optional.ofNullable(updatedUser.getAddress()).ifPresent(existingUser::setAddress);
-                    Optional.ofNullable(updatedUser.getPaymentMethod()).ifPresent(existingUser::setPaymentMethod);
-                    Optional.ofNullable(updatedUser.getFidelityPoints()).ifPresent(existingUser::setFidelityPoints);
-                    Optional.ofNullable(updatedUser.getAveragePurchase()).ifPresent(existingUser::setAveragePurchase);
-
-                    userRepository.save(existingUser);
-
-                    return userRepository.findById(userId).get();
-                })
-                .orElse(null);
-    }
-
-    public List<User> loadListOfUsers(List<User> userList) {
-        return userRepository.saveAll(userList);
+        return userRepository.saveAll(usersToLoad);
     }
 
     public Optional<User> getUserById(long id) {

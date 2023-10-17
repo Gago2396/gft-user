@@ -30,8 +30,8 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUserById(@PathVariable long id, @RequestBody User updatedUser) {
-        User updated = userService.updateUserById(id, updatedUser);
+    public ResponseEntity<User> updateUserById(@PathVariable long id, @RequestBody UserRequest updatedUserRequest) {
+        User updated = userService.updateUserById(id, updatedUserRequest);
         if (updated != null) {
             return ResponseEntity.status(HttpStatus.OK).body(updated);
         } else {
@@ -50,8 +50,8 @@ public class UserController {
     }
 
     @PostMapping("/load")
-    public ResponseEntity<List<User>> loadListOfUsers(@RequestBody List<User> userList) {
-        List<User> savedUsers = userService.loadListOfUsers(userList);
+    public ResponseEntity<List<User>> loadListOfUsers(@RequestBody List<UserRequest> userRequestList) {
+        List<User> savedUsers = userService.loadListOfUsers(userRequestList);
         if (savedUsers != null && !savedUsers.isEmpty()) {
             return ResponseEntity.status(HttpStatus.CREATED).body(savedUsers);
         } else {
