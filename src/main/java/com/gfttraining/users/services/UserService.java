@@ -60,6 +60,7 @@ public class UserService {
 
     public User parseUser(UserRequest userRequest){
 
+        //ToDo: Manejar paymentMethod nulo
         PaymentMethod paymentMethod = findPaymentMethod(userRequest.getPaymentMethod());
 
         User user = new User();
@@ -80,15 +81,7 @@ public class UserService {
         //ToDo: Manejar userRequest nulo
         for (UserRequest userRequest : userRequestList) {
             //ToDo: Manejar paymentMethod nulo
-            PaymentMethod paymentMethod = findPaymentMethod(userRequest.getPaymentMethod());
-
-            User user = new User();
-            user.setName(userRequest.getName());
-            user.setLastName(userRequest.getLastName());
-            user.setAddress(userRequest.getAddress());
-            user.setFidelityPoints(userRequest.getFidelityPoints());
-            user.setAveragePurchase(userRequest.getAveragePurchase());
-            user.setPaymentMethod(paymentMethod);
+            User user = parseUser(userRequest);
 
             usersToLoad.add(user);
         }
