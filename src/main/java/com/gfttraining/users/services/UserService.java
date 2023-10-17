@@ -7,6 +7,7 @@ import com.gfttraining.users.models.UserRequest;
 import com.gfttraining.users.repositories.PaymentMethodRepository;
 import com.gfttraining.users.repositories.UserRepository;
 import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -112,5 +113,9 @@ public class UserService {
 
     public Favorite addFavorite(Favorite favorite) {
         return null;
+    }
+
+    public List<User> getListOfUsers() {
+        return userRepository.findAll();
     }
 }
