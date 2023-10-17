@@ -39,6 +39,26 @@ public class UserService {
     }
 
     public User createUser(UserRequest userRequest) {
+        User user = parseUser(userRequest);
+        return userRepository.save(user);
+    }
+
+    public void deleteUserById(Long id) {
+        userRepository.deleteById(id);
+    }
+
+    public User updateUserById(long userId, UserRequest updatedUserRequest) {
+
+        userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User not found"));
+
+        User user = parseUser(updatedUserRequest);
+        user.setId(userId);
+
+        return userRepository.save(user);
+    }
+
+    public User parseUser(UserRequest userRequest){
 
         PaymentMethod paymentMethod = findPaymentMethod(userRequest.getPaymentMethod());
 
@@ -50,33 +70,7 @@ public class UserService {
         user.setAveragePurchase(userRequest.getAveragePurchase());
         user.setPaymentMethod(paymentMethod);
 
-        return userRepository.save(user);
-
-    }
-
-    public void deleteUserById(Long id) {
-        userRepository.deleteById(id);
-    }
-
-    public User updateUserById(long userId, UserRequest updatedUserRequest) {
-
-        PaymentMethod paymentMethod = findPaymentMethod(updatedUserRequest.getPaymentMethod());
-
-        return userRepository.findById(userId)
-                .map(existingUser -> {
-                    Optional.ofNullable(updatedUserRequest.getName()).ifPresent(existingUser::setName);
-                    Optional.ofNullable(updatedUserRequest.getLastName()).ifPresent(existingUser::setLastName);
-                    Optional.ofNullable(updatedUserRequest.getAddress()).ifPresent(existingUser::setAddress);
-                    Optional.ofNullable(paymentMethod).ifPresent(existingUser::setPaymentMethod);
-                    Optional.ofNullable(updatedUserRequest.getFidelityPoints()).ifPresent(existingUser::setFidelityPoints);
-                    Optional.ofNullable(updatedUserRequest.getAveragePurchase()).ifPresent(existingUser::setAveragePurchase);
-
-                    userRepository.save(existingUser);
-
-                    return userRepository.findById(userId)
-                            .orElseThrow(() -> new NoSuchElementException("User not found"));
-                })
-                .orElse(null);
+        return user;
     }
 
     public List<User> loadListOfUsers(List<UserRequest> userRequestList) {
