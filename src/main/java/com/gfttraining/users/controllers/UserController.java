@@ -41,13 +41,14 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<User> deleteUserById(@PathVariable long id) {
-        User deleted = userService.deleteUserById(id);
-        if (deleted != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(deleted);
-        } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+    public ResponseEntity<?> deleteUserById(@PathVariable long id) {
+        userService.deleteUserById(id);
+        //if (deleted != null) {
+        //    return ResponseEntity.status(HttpStatus.OK).body(deleted);
+        //} else {
+        //    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        //}
+        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
     @PostMapping("/load")

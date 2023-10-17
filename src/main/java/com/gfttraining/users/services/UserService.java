@@ -54,8 +54,8 @@ public class UserService {
 
     }
 
-    public User deleteUserById(Long id) {
-        return null;
+    public void deleteUserById(Long id) {
+        userRepository.deleteById(id);
     }
 
     public User updateUserById(long userId, UserRequest updatedUserRequest) {
