@@ -28,8 +28,8 @@ public class UserService {
         }
     }
 
-    public User deleteUserById(Long id) {
-        return null;
+    public void deleteUserById(Long id) {
+        userRepository.deleteById(id);
     }
 
     private boolean isValidUser(User user) {
