@@ -1,5 +1,6 @@
 package com.gfttraining.users.controllers;
 
+import com.gfttraining.users.exceptions.PaymentMethodNotFoundException;
 import com.gfttraining.users.models.UserRequest;
 import com.gfttraining.users.services.UserService;
 import org.springframework.http.HttpStatus;
@@ -23,8 +24,10 @@ public class UserController {
     public ResponseEntity<?> createUser(@RequestBody @Valid UserRequest userRequest) {
         try {
             return new ResponseEntity<>(userService.createUser(userRequest), HttpStatus.CREATED);
+        } catch (PaymentMethodNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            return new ResponseEntity<>("Ops! Seems like database is down. Try again later!", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
