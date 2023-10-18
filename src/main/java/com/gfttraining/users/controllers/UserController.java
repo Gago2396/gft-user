@@ -26,7 +26,7 @@ public class UserController {
     public ResponseEntity<User> createUser(@RequestBody @Valid UserRequest userRequest) {
         return new ResponseEntity<>(
             userService.createUser(userRequest),
-            HttpStatus.OK
+            HttpStatus.CREATED
         );
     }
 
@@ -43,7 +43,8 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUserById(@PathVariable long id) {
         userService.deleteUserById(id);
-        return ResponseEntity.status(HttpStatus.OK).body(null);
+
+      return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
     @PostMapping("/load")
