@@ -16,5 +16,5 @@ import java.io.Serializable;
 public class FavoritePK implements Serializable {
 
     private Long user;
-    private Long productId;
+    private Long product;
 }
