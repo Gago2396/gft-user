@@ -1,5 +1,6 @@
 package com.gfttraining.users.services;
 
+import com.gfttraining.users.exceptions.PaymentMethodNotFoundException;
 import com.gfttraining.users.models.Favorite;
 import com.gfttraining.users.models.PaymentMethod;
 import com.gfttraining.users.models.User;
@@ -21,26 +22,29 @@ public class UserService {
     private final UserRepository userRepository;
 
     private final PaymentMethodRepository paymentMethodRepository;
-
+  
+    private final PaymentMethodService paymentMethodService;
     private final FavoriteRepository favoriteRepository;
+    
 
-    public UserService(UserRepository userRepository, PaymentMethodRepository paymentMethodRepository, FavoriteRepository favoriteRepository) {
+    public UserService(UserRepository userRepository, PaymentMethodRepository paymentMethodRepository, PaymentMethodService paymentMethodService, FavoriteRepository favoriteRepository) {
         this.userRepository = userRepository;
         this.paymentMethodRepository = paymentMethodRepository;
+        this.paymentMethodService = paymentMethodService;
         this.favoriteRepository = favoriteRepository;
     }
 
     public PaymentMethod findPaymentMethod(String paymentMethodName) {
         try {
-            PaymentMethod paymentMethod = paymentMethodRepository
-                    .findByName(paymentMethodName)
-                    //ToDo: Control negative if payment does not exist
-                    .orElseThrow(ChangeSetPersister.NotFoundException::new);
-            return paymentMethod;
-        } catch (Exception e) {
-            return null;
+            return paymentMethodService
+                    .getPaymentMethodByName(paymentMethodName)
+                    .orElseThrow(() -> new PaymentMethodNotFoundException("PaymentMethod not found"));
+        } catch (PaymentMethodNotFoundException e) {
+            throw e;
         }
     }
+
+
 
     public User createUser(UserRequest userRequest) {
         User user = parseUser(userRequest);
@@ -66,7 +70,6 @@ public class UserService {
 
     public User parseUser(UserRequest userRequest){
 
-        //ToDo: Manejar paymentMethod nulo
         PaymentMethod paymentMethod = findPaymentMethod(userRequest.getPaymentMethod());
 
         User user = new User();
@@ -84,11 +87,8 @@ public class UserService {
 
         List<User> usersToLoad = new ArrayList<>();
 
-        //ToDo: Manejar userRequest nulo
         for (UserRequest userRequest : userRequestList) {
-            //ToDo: Manejar paymentMethod nulo
             User user = parseUser(userRequest);
-
             usersToLoad.add(user);
         }
 

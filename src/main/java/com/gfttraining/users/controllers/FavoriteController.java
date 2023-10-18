@@ -25,31 +25,35 @@ public class FavoriteController {
     }
 
     @PostMapping()
-    public ResponseEntity<Favorite> addFavorite(@RequestBody FavoriteRequest favoriteReq) {
+    public ResponseEntity<?> addFavorite(@RequestBody FavoriteRequest favoriteReq) {
 
         User user = userService.getUserById(favoriteReq.getUser())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
         Favorite favorite = new Favorite(user, favoriteReq.getProduct());
 
-        return new ResponseEntity<>(
-                favoriteService.addFavorite(favorite),
-                HttpStatus.OK
-        );
+        try {
+            return new ResponseEntity<>(favoriteService.addFavorite(favorite), HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Ops! Seems like database is down. Try again later!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @DeleteMapping()
     public ResponseEntity<String> deleteFavorite(@RequestBody FavoriteRequest favoriteReq) {
-        favoriteService.deleteFavorite(favoriteReq.getUser(), favoriteReq.getProduct());
-        return ResponseEntity.ok("Favorite deleted successfully");
+        try {
+            favoriteService.deleteFavorite(favoriteReq.getUser(), favoriteReq.getProduct());
+            return new ResponseEntity<>("Favorite deleted successfully", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> searchUserFavorites(@PathVariable long id) {
         try {
-            FavoriteResponse response = favoriteService.searchUserFavorites(id);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(favoriteService.searchUserFavorites(id), HttpStatus.OK);
+        } catch (Exception e) {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
     }

@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class UserControllerIT {
-
+//anyassert
     @Autowired
     private TestRestTemplate restTemplate;
 
@@ -40,6 +40,25 @@ public class UserControllerIT {
         assertEquals(createdUser.getFidelityPoints(), 100);
         assertEquals(createdUser.getAveragePurchase(), 75.0);
 
+    }
+
+    @Test
+    @DisplayName("Update User by ID")
+    public void testUpdateUserById() {
+        long userId = 1L;
+
+        UserRequest updatedUserRequest = new UserRequest(2L, "Josh", "Dowe", "123 Main St", "PayPal", 100, 75.0);
+
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<UserRequest> requestEntity = new HttpEntity<>(updatedUserRequest, headers);
+
+        ResponseEntity<User> responseEntity = restTemplate.exchange("/users/" + userId, HttpMethod.PUT, requestEntity, User.class);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+        User updatedUser = responseEntity.getBody();
+        assertEquals(updatedUser.getName(), "Josh");
+        assertEquals(updatedUser.getLastName(), "Dowe");
     }
 
     //ToDo: Negative POST User
