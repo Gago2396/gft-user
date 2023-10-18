@@ -3,7 +3,6 @@ package com.gfttraining.users.models;
 import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "favorites")
@@ -20,6 +19,6 @@ public class Favorite {
 
     @Id
     @Column(name = "product_id", nullable = false)
-    private Long productId;
+    private Long product;
 
 }

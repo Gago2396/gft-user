@@ -2,6 +2,7 @@ package com.gfttraining.users.controllers;
 
 import com.gfttraining.users.models.Favorite;
 import com.gfttraining.users.models.FavoriteRequest;
+import com.gfttraining.users.models.FavoriteResponse;
 import com.gfttraining.users.models.User;
 import com.gfttraining.users.services.FavoriteService;
 import com.gfttraining.users.services.UserService;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping("/users/favorite")
+@RequestMapping("/users/favorites")
 public class FavoriteController {
 
     private final FavoriteService favoriteService;
@@ -41,6 +42,16 @@ public class FavoriteController {
     public ResponseEntity<String> deleteFavorite(@RequestBody FavoriteRequest favoriteReq) {
         favoriteService.deleteFavorite(favoriteReq.getUser(), favoriteReq.getProduct());
         return ResponseEntity.ok("Favorite deleted successfully");
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> searchUserFavorites(@PathVariable long id) {
+        try {
+            FavoriteResponse response = favoriteService.searchUserFavorites(id);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
     }
 
 }
