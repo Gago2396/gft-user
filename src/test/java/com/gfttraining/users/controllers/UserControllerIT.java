@@ -8,7 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -88,4 +92,22 @@ public class UserControllerIT {
 
     //ToDo: Negative GET User
 
+    @Test
+    @DisplayName("Load List of Users")
+    public void testLoadListOfUsers() {
+        List<UserRequest> userRequestList = new ArrayList<>();
+        userRequestList.add(new UserRequest(2L,"John", "Doe", "123 Main St", "PayPal", 100, 75.0));
+        userRequestList.add(new UserRequest(3L, "Alice", "Johnson", "456 Elm St", "Credit Card", 200, 50.0));
+
+        HttpEntity<List<UserRequest>> requestEntity = new HttpEntity<>(userRequestList);
+
+        ParameterizedTypeReference<List<User>> responseType = new ParameterizedTypeReference<List<User>>() {};
+        ResponseEntity<List<User>> responseEntity = restTemplate.exchange("/users/load", HttpMethod.POST, requestEntity, responseType);
+
+        assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
+
+        List<User> savedUsers = responseEntity.getBody();
+
+        assertNotNull(savedUsers);
+    }
 }
