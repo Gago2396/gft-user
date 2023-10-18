@@ -112,8 +112,16 @@ public class UserControllerIT {
 
         assertEquals("John", savedUsers.get(0).getName());
         assertEquals("Doe", savedUsers.get(0).getLastName());
+        assertEquals("123 Main St", savedUsers.get(0).getAddress());
+        assertEquals("PayPal", savedUsers.get(0).getPaymentMethod().getName());
+        assertEquals(100, savedUsers.get(0).getFidelityPoints());
+        assertEquals(75.0, savedUsers.get(0).getAveragePurchase());
 
         assertEquals("Alice", savedUsers.get(1).getName());
         assertEquals("Johnson", savedUsers.get(1).getLastName());
+        assertEquals("456 Elm St", savedUsers.get(1).getAddress());
+        assertEquals("Credit Card", savedUsers.get(1).getPaymentMethod().getName());
+        assertEquals(200, savedUsers.get(1).getFidelityPoints());
+        assertEquals(50.0, savedUsers.get(1).getAveragePurchase());
     }
 }
