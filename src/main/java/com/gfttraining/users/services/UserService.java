@@ -5,6 +5,7 @@ import com.gfttraining.users.models.Favorite;
 import com.gfttraining.users.models.PaymentMethod;
 import com.gfttraining.users.models.User;
 import com.gfttraining.users.models.UserRequest;
+import com.gfttraining.users.repositories.FavoriteRepository;
 import com.gfttraining.users.repositories.PaymentMethodRepository;
 import com.gfttraining.users.repositories.UserRepository;
 import org.springframework.data.crossstore.ChangeSetPersister;
@@ -21,13 +22,16 @@ public class UserService {
     private final UserRepository userRepository;
 
     private final PaymentMethodRepository paymentMethodRepository;
-
+  
     private final PaymentMethodService paymentMethodService;
+    private final FavoriteRepository favoriteRepository;
+    
 
-    public UserService(UserRepository userRepository, PaymentMethodRepository paymentMethodRepository, PaymentMethodService paymentMethodService) {
+    public UserService(UserRepository userRepository, PaymentMethodRepository paymentMethodRepository, PaymentMethodService paymentMethodService, FavoriteRepository favoriteRepository) {
         this.userRepository = userRepository;
         this.paymentMethodRepository = paymentMethodRepository;
         this.paymentMethodService = paymentMethodService;
+        this.favoriteRepository = favoriteRepository;
     }
 
     public PaymentMethod findPaymentMethod(String paymentMethodName) {
@@ -48,6 +52,8 @@ public class UserService {
     }
 
     public void deleteUserById(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("No user found"));
+        favoriteRepository.deleteByUser(user);
         userRepository.deleteById(id);
     }
 

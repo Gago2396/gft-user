@@ -57,4 +57,11 @@ public class FavoriteController {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteFavoriteByProduct(@PathVariable long id) {
+        favoriteService.deleteFavoriteByProduct(id);
+        return ResponseEntity.ok("Favorites deleted successfully");
+    }
+
 }

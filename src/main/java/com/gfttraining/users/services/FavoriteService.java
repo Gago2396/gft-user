@@ -48,4 +48,8 @@ public class FavoriteService {
 
         return new FavoriteResponse(user, productIds);
     }
+
+    public void deleteFavoriteByProduct(Long productId) {
+        favoriteRepository.deleteByProduct(productId);
+    }
 }
