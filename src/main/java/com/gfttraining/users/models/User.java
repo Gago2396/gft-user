@@ -16,13 +16,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Name is required")
     private String name;
 
     private String lastName;
 
     private String address;
-
 
     @ManyToOne
     @JoinColumn
