@@ -109,5 +109,11 @@ public class UserControllerIT {
         List<User> savedUsers = responseEntity.getBody();
 
         assertNotNull(savedUsers);
+
+        assertEquals("John", savedUsers.get(0).getName());
+        assertEquals("Doe", savedUsers.get(0).getLastName());
+
+        assertEquals("Alice", savedUsers.get(1).getName());
+        assertEquals("Johnson", savedUsers.get(1).getLastName());
     }
 }
