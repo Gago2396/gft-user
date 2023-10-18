@@ -23,58 +23,66 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody @Valid UserRequest userRequest) {
-        return new ResponseEntity<>(
-            userService.createUser(userRequest),
-            HttpStatus.CREATED
-        );
+    public ResponseEntity<?> createUser(@RequestBody @Valid UserRequest userRequest) {
+        try {
+            return new ResponseEntity<>(userService.createUser(userRequest), HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Ops! Seems like database is down. Try again later!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUserById(@PathVariable long id, @RequestBody UserRequest updatedUserRequest) {
-        User updated = userService.updateUserById(id, updatedUserRequest);
-        if (updated != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(updated);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+    public ResponseEntity<?> updateUserById(@PathVariable long id, @RequestBody @Valid UserRequest updatedUserRequest) {
+        try {
+            return new ResponseEntity<>(userService.updateUserById(id, updatedUserRequest), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUserById(@PathVariable long id) {
-        userService.deleteUserById(id);
-
-      return ResponseEntity.status(HttpStatus.OK).body(null);
+        try {
+            userService.deleteUserById(id);
+            return new ResponseEntity<>("User was deleted succesfully", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
     }
 
     @PostMapping("/load")
-    public ResponseEntity<List<User>> loadListOfUsers(@RequestBody List<UserRequest> userRequestList) {
-        List<User> savedUsers = userService.loadListOfUsers(userRequestList);
-        if (savedUsers != null && !savedUsers.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedUsers);
-        } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    public ResponseEntity<?> loadListOfUsers(@RequestBody @Valid List<UserRequest> userRequestList) {
+        try {
+            return new ResponseEntity<>(userService.loadListOfUsers(userRequestList), HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Ops! Seems like database is down. Try again later!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable long id) {
-        Optional<User> user = userService.getUserById(id);
-
-        return user.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    public ResponseEntity<?> getUserById(@PathVariable long id) {
+        try {
+            return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("/search/{name}")
-    public ResponseEntity<List<User>> getUserByName(@PathVariable String name) {
-        Optional<List<User>> user = userService.getUserByName(name);
-        return user.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    public ResponseEntity<?> getUserByName(@PathVariable String name) {
+        try {
+            return new ResponseEntity<>(userService.getUserByName(name), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<User>> getListOfUsers(){
-        return new ResponseEntity<>(
-                userService.getListOfUsers(),
-                HttpStatus.OK
-        );
+    public ResponseEntity<?> getListOfUsers() {
+        try {
+            return new ResponseEntity<>(userService.getListOfUsers(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Ops! Seems like database is down. Try again later!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
