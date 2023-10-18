@@ -1,10 +1,11 @@
 package com.gfttraining.users.initdata;
 
+import com.gfttraining.users.models.Favorite;
 import com.gfttraining.users.models.PaymentMethod;
 import com.gfttraining.users.models.User;
+import com.gfttraining.users.repositories.FavoriteRepository;
 import com.gfttraining.users.repositories.PaymentMethodRepository;
 import com.gfttraining.users.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -14,11 +15,17 @@ import java.util.List;
 @Component
 public class DataInitializer implements CommandLineRunner {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private PaymentMethodRepository paymentMethodRepository;
+    private final PaymentMethodRepository paymentMethodRepository;
+
+    private final FavoriteRepository favoriteRepository;
+
+    public DataInitializer(UserRepository userRepository, PaymentMethodRepository paymentMethodRepository, FavoriteRepository favoriteRepository) {
+        this.userRepository = userRepository;
+        this.paymentMethodRepository = paymentMethodRepository;
+        this.favoriteRepository = favoriteRepository;
+    }
 
     @Override
     public void run(String... args) {
@@ -47,5 +54,15 @@ public class DataInitializer implements CommandLineRunner {
         users.add(new User(10L, "Jennifer", "Brown", "6666 Cedar St", paymentMethod1, 160, 120.00));
 
         userRepository.saveAll(users);
+
+        List<Favorite> favorites = new ArrayList<>();
+        favorites.add(new Favorite(users.get(2), 3L));
+        favorites.add(new Favorite(users.get(2), 4L));
+        favorites.add(new Favorite(users.get(5), 3L));
+        favorites.add(new Favorite(users.get(3), 2L));
+        favorites.add(new Favorite(users.get(1), 1L));
+        favorites.add(new Favorite(users.get(1), 1L));
+
+        favoriteRepository.saveAll(favorites);
     }
 }
