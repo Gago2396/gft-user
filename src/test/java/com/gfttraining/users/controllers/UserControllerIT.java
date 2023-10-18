@@ -54,12 +54,11 @@ public class UserControllerIT {
 
         ResponseEntity<User> responseEntity = restTemplate.exchange("/users/" + userId, HttpMethod.PUT, requestEntity, User.class);
 
-        System.out.println(requestEntity.getBody());
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
         User updatedUser = responseEntity.getBody();
-        assertEquals(updatedUser.getName(), "UpdatedName");
-        assertEquals(updatedUser.getLastName(), "UpdatedLastName");
+        assertEquals(updatedUser.getName(), "Josh");
+        assertEquals(updatedUser.getLastName(), "Dowe");
     }
 
     //ToDo: Negative POST User
