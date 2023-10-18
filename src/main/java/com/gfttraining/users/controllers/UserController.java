@@ -1,7 +1,5 @@
 package com.gfttraining.users.controllers;
 
-import com.gfttraining.users.models.Favorite;
-import com.gfttraining.users.models.User;
 import com.gfttraining.users.models.UserRequest;
 import com.gfttraining.users.services.UserService;
 import org.springframework.http.HttpStatus;
@@ -10,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -44,7 +41,7 @@ public class UserController {
     public ResponseEntity<?> deleteUserById(@PathVariable long id) {
         try {
             userService.deleteUserById(id);
-            return new ResponseEntity<>("User was deleted succesfully", HttpStatus.OK);
+            return new ResponseEntity<>("User deleted succesfully", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
