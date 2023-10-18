@@ -2,10 +2,6 @@ package com.gfttraining.users.models;
 
 import lombok.*;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-
-
 
 @Data
 @AllArgsConstructor
@@ -13,6 +9,6 @@ import javax.validation.constraints.NotBlank;
 public class FavoriteRequest {
 
     private Long user;
-    private Long productId;
+    private Long product;
 
 }
