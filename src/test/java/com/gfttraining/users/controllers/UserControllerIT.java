@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -123,5 +124,14 @@ public class UserControllerIT {
         assertEquals("Credit Card", savedUsers.get(1).getPaymentMethod().getName());
         assertEquals(200, savedUsers.get(1).getFidelityPoints());
         assertEquals(50.0, savedUsers.get(1).getAveragePurchase());
+    }
+
+    @Test
+    public void testGetListOfUsers() {
+        ResponseEntity<String> responseEntity = restTemplate.getForEntity("/users/list", String.class);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+        String responseBody = responseEntity.getBody();
     }
 }
