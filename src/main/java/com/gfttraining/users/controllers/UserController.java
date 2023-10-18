@@ -44,7 +44,7 @@ public class UserController {
     public ResponseEntity<?> deleteUserById(@PathVariable long id) {
         userService.deleteUserById(id);
 
-        return ResponseEntity.status(HttpStatus.OK).body(null);
+      return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
     @PostMapping("/load")
@@ -70,4 +70,11 @@ public class UserController {
         return user.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    @GetMapping("/list")
+    public ResponseEntity<List<User>> getListOfUsers(){
+        return new ResponseEntity<>(
+                userService.getListOfUsers(),
+                HttpStatus.OK
+        );
+    }
 }
