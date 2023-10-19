@@ -26,7 +26,18 @@ public class UserControllerIT {
     @Test
     @DisplayName("Create User")
     public void testCreateUser() {
-        UserRequest userRequest = new UserRequest(1L, "John", "Doe", "123 Main St", "PayPal", 100, 75.0);
+        UserRequest userRequest = new UserRequest(
+                "John",
+                "Doe",
+                "123 Main St",
+                "City",
+                "Province",
+                12345,
+                "Country",
+                "PayPal",
+                100,
+                75.0
+        );
 
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<UserRequest> requestEntity = new HttpEntity<>(userRequest, headers);
@@ -40,11 +51,14 @@ public class UserControllerIT {
         assertNotNull(createdUser);
         assertEquals(createdUser.getName(), "John");
         assertEquals(createdUser.getLastName(), "Doe");
-        assertEquals(createdUser.getAddress(), "123 Main St");
+        assertEquals(createdUser.getAddress().getStreet(), "123 Main St");
+        assertEquals(createdUser.getAddress().getCity(), "City");
+        assertEquals(createdUser.getAddress().getProvince(), "Province");
+        assertEquals(createdUser.getAddress().getPostalCode(), 12345);
+        assertEquals(createdUser.getAddress().getCountry(), "Country");
         assertEquals(createdUser.getPaymentMethod().getName(), "PayPal");
         assertEquals(createdUser.getFidelityPoints(), 100);
         assertEquals(createdUser.getAveragePurchase(), 75.0);
-
     }
 
     @Test
@@ -52,7 +66,18 @@ public class UserControllerIT {
     public void testUpdateUserById() {
         long userId = 1L;
 
-        UserRequest updatedUserRequest = new UserRequest(2L, "Josh", "Dowe", "123 Main St", "PayPal", 100, 75.0);
+        UserRequest updatedUserRequest = new UserRequest(
+                "Josh",
+                "Dowe",
+                "123 Main St",
+                "UpdatedCity",
+                "UpdatedProvince",
+                54321,
+                "UpdatedCountry",
+                "UpdatedPaymentMethod",
+                200,
+                85.0
+        );
 
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<UserRequest> requestEntity = new HttpEntity<>(updatedUserRequest, headers);
@@ -64,6 +89,14 @@ public class UserControllerIT {
         User updatedUser = responseEntity.getBody();
         assertEquals(updatedUser.getName(), "Josh");
         assertEquals(updatedUser.getLastName(), "Dowe");
+        assertEquals(updatedUser.getAddress().getStreet(), "123 Main St");
+        assertEquals(updatedUser.getAddress().getCity(), "UpdatedCity");
+        assertEquals(updatedUser.getAddress().getProvince(), "UpdatedProvince");
+        assertEquals(updatedUser.getAddress().getPostalCode(), 54321);
+        assertEquals(updatedUser.getAddress().getCountry(), "UpdatedCountry");
+        assertEquals(updatedUser.getPaymentMethod().getName(), "UpdatedPaymentMethod");
+        assertEquals(updatedUser.getFidelityPoints(), 200);
+        assertEquals(updatedUser.getAveragePurchase(), 85.0);
     }
 
     @Test
@@ -71,7 +104,7 @@ public class UserControllerIT {
     public void testUpdateUserByIdNegative() {
         long nonExistentUserId = 9999L;
 
-        UserRequest updatedUserRequest = new UserRequest(nonExistentUserId,"UpdatedName", "UpdatedLastName", "UpdatedAddress", "UpdatedPaymentMethod", 300, 90.0);
+        UserRequest updatedUserRequest = new UserRequest("UpdatedName", "UpdatedLastName", "UpdatedAddress", "UpdatedCity", "UpdatedProvince", 54321, "UpdatedCountry", "UpdatedPaymentMethod", 300, 90.0);
 
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<UserRequest> requestEntity = new HttpEntity<>(updatedUserRequest, headers);
@@ -101,6 +134,10 @@ public class UserControllerIT {
         assertEquals("John", user.getName());
         assertEquals("Doe", user.getLastName());
         assertEquals("1234 Elm St", user.getAddress());
+        assertEquals("City", user.getAddress().getCity());               // Nuevo campo: Ciudad
+        assertEquals("Province", user.getAddress().getProvince());       // Nuevo campo: Provincia
+        assertEquals(12345, user.getAddress().getPostalCode());           // Nuevo campo: Código Postal
+        assertEquals("Country", user.getAddress().getCountry());         // Nuevo campo: País
         assertEquals("Credit Card", user.getPaymentMethod().getName());
         assertEquals(100, user.getFidelityPoints());
         assertEquals(75.50, user.getAveragePurchase(), 0.001);
@@ -112,8 +149,8 @@ public class UserControllerIT {
     @DisplayName("Load List of Users")
     public void testLoadListOfUsers() {
         List<UserRequest> userRequestList = new ArrayList<>();
-        userRequestList.add(new UserRequest(2L,"John", "Doe", "123 Main St", "PayPal", 100, 75.0));
-        userRequestList.add(new UserRequest(3L, "Alice", "Johnson", "456 Elm St", "Credit Card", 200, 50.0));
+        userRequestList.add(new UserRequest("John", "Doe", "123 Main St", "City", "Province", 12345, "Country", "PayPal", 100, 75.0));
+        userRequestList.add(new UserRequest("Alice", "Johnson", "456 Elm St", "Another City", "Another Province", 54321, "Another Country", "Credit Card", 200, 50.0));
 
         HttpEntity<List<UserRequest>> requestEntity = new HttpEntity<>(userRequestList);
 
@@ -128,14 +165,22 @@ public class UserControllerIT {
 
         assertEquals("John", savedUsers.get(0).getName());
         assertEquals("Doe", savedUsers.get(0).getLastName());
-        assertEquals("123 Main St", savedUsers.get(0).getAddress());
+        assertEquals("123 Main St", savedUsers.get(0).getAddress().getStreet());
+        assertEquals("City", savedUsers.get(0).getAddress().getCity());
+        assertEquals("Province", savedUsers.get(0).getAddress().getProvince());
+        assertEquals(12345, savedUsers.get(0).getAddress().getPostalCode());
+        assertEquals("Country", savedUsers.get(0).getAddress().getCountry());
         assertEquals("PayPal", savedUsers.get(0).getPaymentMethod().getName());
         assertEquals(100, savedUsers.get(0).getFidelityPoints());
         assertEquals(75.0, savedUsers.get(0).getAveragePurchase());
 
         assertEquals("Alice", savedUsers.get(1).getName());
         assertEquals("Johnson", savedUsers.get(1).getLastName());
-        assertEquals("456 Elm St", savedUsers.get(1).getAddress());
+        assertEquals("456 Elm St", savedUsers.get(1).getAddress().getStreet());
+        assertEquals("Another City", savedUsers.get(1).getAddress().getCity());
+        assertEquals("Another Province", savedUsers.get(1).getAddress().getProvince());
+        assertEquals(54321, savedUsers.get(1).getAddress().getPostalCode());
+        assertEquals("Another Country", savedUsers.get(1).getAddress().getCountry());
         assertEquals("Credit Card", savedUsers.get(1).getPaymentMethod().getName());
         assertEquals(200, savedUsers.get(1).getFidelityPoints());
         assertEquals(50.0, savedUsers.get(1).getAveragePurchase());
