@@ -11,11 +11,14 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 public class UserRequest {
 
-    private Long id;
     @NotBlank(message = "Name is required")
     private String name;
     private String lastName;
-    private String address;
+    private String street;
+    private String city;
+    private String province;
+    private int postalCode;
+    private String country;
     @NotBlank(message = "Payment Method is required")
     private String paymentMethod;
     private int fidelityPoints;

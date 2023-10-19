@@ -1,11 +1,7 @@
 package com.gfttraining.users.initdata;
 
-import com.gfttraining.users.models.Favorite;
-import com.gfttraining.users.models.PaymentMethod;
-import com.gfttraining.users.models.User;
-import com.gfttraining.users.repositories.FavoriteRepository;
-import com.gfttraining.users.repositories.PaymentMethodRepository;
-import com.gfttraining.users.repositories.UserRepository;
+import com.gfttraining.users.models.*;
+import com.gfttraining.users.repositories.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -21,10 +17,16 @@ public class DataInitializer implements CommandLineRunner {
 
     private final FavoriteRepository favoriteRepository;
 
-    public DataInitializer(UserRepository userRepository, PaymentMethodRepository paymentMethodRepository, FavoriteRepository favoriteRepository) {
+    private final CountryRepository countryRepository;
+
+    private final AddressRepository addressRepository;
+
+    public DataInitializer(UserRepository userRepository, PaymentMethodRepository paymentMethodRepository, FavoriteRepository favoriteRepository, CountryRepository countryRepository, AddressRepository addressRepository) {
         this.userRepository = userRepository;
         this.paymentMethodRepository = paymentMethodRepository;
         this.favoriteRepository = favoriteRepository;
+        this.countryRepository = countryRepository;
+        this.addressRepository = addressRepository;
     }
 
     @Override
@@ -41,17 +43,42 @@ public class DataInitializer implements CommandLineRunner {
         paymentMethodRepository.save(paymentMethod2);
         paymentMethodRepository.save(paymentMethod3);
 
+        List<Country> countries = new ArrayList<>();
+        countries.add(new Country(1L, "Spain"));
+        countries.add(new Country(2L, "Estonia"));
+        countries.add(new Country(3L, "Finland"));
+        countries.add(new Country(4L, "France"));
+        countries.add(new Country(5L, "Italy"));
+        countries.add(new Country(6L, "Portugal"));
+        countries.add(new Country(7L, "Greece"));
+
+        countryRepository.saveAll(countries);
+
+        List<Address> addresses = new ArrayList<>();
+        addresses.add(new Address(1L, "Sunset Blvd", "Barcelona", "Catalonia", 12345, countries.get(0)));
+        addresses.add(new Address(2L, "Green Valley Rd", "Tallinn", "Harju County", 56789, countries.get(1)));
+        addresses.add(new Address(3L, "Northern Lights Ave", "Helsinki", "Uusimaa", 10111, countries.get(2)));
+        addresses.add(new Address(4L, "Eiffel Tower Street", "Paris", "Ile-de-France", 31415, countries.get(3)));
+        addresses.add(new Address(5L, "Roman Forum Lane", "Rome", "Lazio", 98765, countries.get(4)));
+        addresses.add(new Address(6L, "Port Wine Street", "Lisbon", "Lisbon District", 54321, countries.get(5)));
+        addresses.add(new Address(7L, "Olive Grove Street", "Athens", "Attica", 67890, countries.get(6)));
+        addresses.add(new Address(8L, "Sagrada Familia Blvd", "Barcelona", "Catalonia", 24680, countries.get(0)));
+        addresses.add(new Address(9L, "Estonian Forest Rd", "Tallinn", "Harju County", 13579, countries.get(1)));
+        addresses.add(new Address(10L, "Lakeside Drive", "Helsinki", "Uusimaa", 11223, countries.get(2)));
+
+        addressRepository.saveAll(addresses);
+
         List<User> users = new ArrayList<>();
-        users.add(new User(1L, "John", "Doe", "1234 Elm St", paymentMethod1, 100, 75.50));
-        users.add(new User(2L, "Jane", "Smith", "5678 Oak St", paymentMethod2, 150, 100.20));
-        users.add(new User(3L, "Michael", "Johnson", "789 Main St", paymentMethod1, 120, 90.75));
-        users.add(new User(4L, "Emily", "Davis", "456 Pine St", paymentMethod2, 200, 120.30));
-        users.add(new User(5L, "David", "Anderson", "1010 Maple St", paymentMethod3, 80, 60.00));
-        users.add(new User(6L, "Sarah", "Johnson", "2222 Oak St", paymentMethod3, 90, 80.00));
-        users.add(new User(7L, "Mark", "Davis", "3333 Elm St", paymentMethod3, 120, 95.50));
-        users.add(new User(8L, "Anna", "Smith", "4444 Pine St", paymentMethod1, 180, 150.75));
-        users.add(new User(9L, "Michael", "Wilson", "5555 Maple St", paymentMethod2, 140, 110.20));
-        users.add(new User(10L, "Jennifer", "Brown", "6666 Cedar St", paymentMethod1, 160, 120.00));
+        users.add(new User(1L, "John", "Doe", addresses.get(0), paymentMethod1, 100, 75.50));
+        users.add(new User(2L, "Jane", "Smith", addresses.get(1), paymentMethod2, 150, 100.20));
+        users.add(new User(3L, "Michael", "Johnson", addresses.get(2), paymentMethod1, 120, 90.75));
+        users.add(new User(4L, "Emily", "Davis", addresses.get(3), paymentMethod2, 200, 120.30));
+        users.add(new User(5L, "David", "Anderson", addresses.get(4), paymentMethod3, 80, 60.00));
+        users.add(new User(6L, "Sarah", "Johnson", addresses.get(5), paymentMethod3, 90, 80.00));
+        users.add(new User(7L, "Mark", "Davis", addresses.get(6), paymentMethod3, 120, 95.50));
+        users.add(new User(8L, "Anna", "Smith", addresses.get(7), paymentMethod1, 180, 150.75));
+        users.add(new User(9L, "Michael", "Wilson", addresses.get(8), paymentMethod2, 140, 110.20));
+        users.add(new User(10L, "Jennifer", "Brown", addresses.get(9), paymentMethod1, 160, 120.00));
 
         userRepository.saveAll(users);
 
