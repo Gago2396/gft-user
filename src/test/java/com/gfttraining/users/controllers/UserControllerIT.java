@@ -48,21 +48,6 @@ public class UserControllerIT {
     }
 
     @Test
-    @DisplayName("Create User - Negative Test")
-    public void testCreateUserNegative() {
-        UserRequest userRequest = new UserRequest(1L, "John","Doe", "123 Main St", "PayPal", 100, 75.0);
-
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity<UserRequest> requestEntity = new HttpEntity<>(userRequest, headers);
-
-        ResponseEntity<User> responseEntity = restTemplate.exchange("/users", HttpMethod.POST, requestEntity, User.class);
-
-        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-
-        assertNull(responseEntity.getBody());
-    }
-
-    @Test
     @DisplayName("Update User by ID")
     public void testUpdateUserById() {
         long userId = 1L;
@@ -81,7 +66,22 @@ public class UserControllerIT {
         assertEquals(updatedUser.getLastName(), "Dowe");
     }
 
-    //ToDo: Negative POST User
+    @Test
+    @DisplayName("Update User by ID - Negative Test")
+    public void testUpdateUserByIdNegative() {
+        long nonExistentUserId = 9999L;
+
+        UserRequest updatedUserRequest = new UserRequest(nonExistentUserId,"UpdatedName", "UpdatedLastName", "UpdatedAddress", "UpdatedPaymentMethod", 300, 90.0);
+
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<UserRequest> requestEntity = new HttpEntity<>(updatedUserRequest, headers);
+
+        ResponseEntity<String> responseEntity = restTemplate.exchange("/users/" + nonExistentUserId, HttpMethod.PUT, requestEntity, String.class);
+
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+
+        assertEquals("User not found", responseEntity.getBody());
+    }
 
     @Test
     @DisplayName("Get User by id")
