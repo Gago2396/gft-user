@@ -2,16 +2,14 @@ package com.gfttraining.users.services;
 
 import com.gfttraining.users.models.Favorite;
 import com.gfttraining.users.models.FavoritePK;
-import com.gfttraining.users.models.FavoriteResponse;
+import com.gfttraining.users.models.FavoriteDTO;
 import com.gfttraining.users.models.User;
 import com.gfttraining.users.repositories.FavoriteRepository;
 import com.gfttraining.users.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,7 +33,7 @@ public class FavoriteService {
         favoriteRepository.deleteById(id);
     }
 
-    public FavoriteResponse searchUserFavorites(Long id) {
+    public FavoriteDTO searchUserFavorites(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
@@ -46,10 +44,11 @@ public class FavoriteService {
                 .map(Favorite::getProduct)
                 .collect(Collectors.toList());
 
-        return new FavoriteResponse(user, productIds);
+        return new FavoriteDTO(user, productIds);
     }
 
     public void deleteFavoriteByProduct(Long productId) {
+//        ToDo: Add NOT_FOUND response when microservices are connected
         favoriteRepository.deleteByProduct(productId);
     }
 }

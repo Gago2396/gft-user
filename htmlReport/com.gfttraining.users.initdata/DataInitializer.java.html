@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DataInitializer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">java in users Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.gfttraining.users.initdata</a> &gt; <span class="el_source">DataInitializer.java</span></div><h1>DataInitializer.java</h1><pre class="source lang-java linenums">package com.gfttraining.users.initdata;
+
+import com.gfttraining.users.models.Favorite;
+import com.gfttraining.users.models.PaymentMethod;
+import com.gfttraining.users.models.User;
+import com.gfttraining.users.repositories.FavoriteRepository;
+import com.gfttraining.users.repositories.PaymentMethodRepository;
+import com.gfttraining.users.repositories.UserRepository;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Component
+public class DataInitializer implements CommandLineRunner {
+
+    private final UserRepository userRepository;
+
+    private final PaymentMethodRepository paymentMethodRepository;
+
+    private final FavoriteRepository favoriteRepository;
+
+<span class="fc" id="L24">    public DataInitializer(UserRepository userRepository, PaymentMethodRepository paymentMethodRepository, FavoriteRepository favoriteRepository) {</span>
+<span class="fc" id="L25">        this.userRepository = userRepository;</span>
+<span class="fc" id="L26">        this.paymentMethodRepository = paymentMethodRepository;</span>
+<span class="fc" id="L27">        this.favoriteRepository = favoriteRepository;</span>
+<span class="fc" id="L28">    }</span>
+
+    @Override
+    public void run(String... args) {
+<span class="fc" id="L32">        initializeData();</span>
+<span class="fc" id="L33">    }</span>
+
+    private void initializeData() {
+<span class="fc" id="L36">        PaymentMethod paymentMethod1 = new PaymentMethod(1L, &quot;Credit Card&quot;);</span>
+<span class="fc" id="L37">        PaymentMethod paymentMethod2 = new PaymentMethod(2L, &quot;PayPal&quot;);</span>
+<span class="fc" id="L38">        PaymentMethod paymentMethod3 = new PaymentMethod(3L, &quot;Stripe&quot;);</span>
+
+<span class="fc" id="L40">        paymentMethodRepository.save(paymentMethod1);</span>
+<span class="fc" id="L41">        paymentMethodRepository.save(paymentMethod2);</span>
+<span class="fc" id="L42">        paymentMethodRepository.save(paymentMethod3);</span>
+
+<span class="fc" id="L44">        List&lt;User&gt; users = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L45">        users.add(new User(1L, &quot;John&quot;, &quot;Doe&quot;, &quot;1234 Elm St&quot;, paymentMethod1, 100, 75.50));</span>
+<span class="fc" id="L46">        users.add(new User(2L, &quot;Jane&quot;, &quot;Smith&quot;, &quot;5678 Oak St&quot;, paymentMethod2, 150, 100.20));</span>
+<span class="fc" id="L47">        users.add(new User(3L, &quot;Michael&quot;, &quot;Johnson&quot;, &quot;789 Main St&quot;, paymentMethod1, 120, 90.75));</span>
+<span class="fc" id="L48">        users.add(new User(4L, &quot;Emily&quot;, &quot;Davis&quot;, &quot;456 Pine St&quot;, paymentMethod2, 200, 120.30));</span>
+<span class="fc" id="L49">        users.add(new User(5L, &quot;David&quot;, &quot;Anderson&quot;, &quot;1010 Maple St&quot;, paymentMethod3, 80, 60.00));</span>
+<span class="fc" id="L50">        users.add(new User(6L, &quot;Sarah&quot;, &quot;Johnson&quot;, &quot;2222 Oak St&quot;, paymentMethod3, 90, 80.00));</span>
+<span class="fc" id="L51">        users.add(new User(7L, &quot;Mark&quot;, &quot;Davis&quot;, &quot;3333 Elm St&quot;, paymentMethod3, 120, 95.50));</span>
+<span class="fc" id="L52">        users.add(new User(8L, &quot;Anna&quot;, &quot;Smith&quot;, &quot;4444 Pine St&quot;, paymentMethod1, 180, 150.75));</span>
+<span class="fc" id="L53">        users.add(new User(9L, &quot;Michael&quot;, &quot;Wilson&quot;, &quot;5555 Maple St&quot;, paymentMethod2, 140, 110.20));</span>
+<span class="fc" id="L54">        users.add(new User(10L, &quot;Jennifer&quot;, &quot;Brown&quot;, &quot;6666 Cedar St&quot;, paymentMethod1, 160, 120.00));</span>
+
+<span class="fc" id="L56">        userRepository.saveAll(users);</span>
+
+<span class="fc" id="L58">        List&lt;Favorite&gt; favorites = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L59">        favorites.add(new Favorite(users.get(2), 3L));</span>
+<span class="fc" id="L60">        favorites.add(new Favorite(users.get(2), 4L));</span>
+<span class="fc" id="L61">        favorites.add(new Favorite(users.get(5), 3L));</span>
+<span class="fc" id="L62">        favorites.add(new Favorite(users.get(3), 2L));</span>
+<span class="fc" id="L63">        favorites.add(new Favorite(users.get(1), 1L));</span>
+<span class="fc" id="L64">        favorites.add(new Favorite(users.get(1), 1L));</span>
+
+<span class="fc" id="L66">        favoriteRepository.saveAll(favorites);</span>
+<span class="fc" id="L67">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

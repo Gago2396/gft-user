@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FavoriteController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">java in users Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.gfttraining.users.controllers</a> &gt; <span class="el_source">FavoriteController.java</span></div><h1>FavoriteController.java</h1><pre class="source lang-java linenums">package com.gfttraining.users.controllers;
+
+import com.gfttraining.users.models.Favorite;
+import com.gfttraining.users.models.FavoriteRequest;
+import com.gfttraining.users.models.FavoriteResponse;
+import com.gfttraining.users.models.User;
+import com.gfttraining.users.services.FavoriteService;
+import com.gfttraining.users.services.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.NoSuchElementException;
+
+@RestController
+@RequestMapping(&quot;/users/favorites&quot;)
+public class FavoriteController {
+
+    private final FavoriteService favoriteService;
+    private final UserService userService;
+
+<span class="fc" id="L22">    public FavoriteController(FavoriteService favoriteService, UserService userService) {</span>
+<span class="fc" id="L23">        this.favoriteService = favoriteService;</span>
+<span class="fc" id="L24">        this.userService = userService;</span>
+<span class="fc" id="L25">    }</span>
+
+    @PostMapping()
+    public ResponseEntity&lt;?&gt; addFavorite(@RequestBody FavoriteRequest favoriteReq) {
+
+<span class="nc" id="L30">        User user = userService.getUserById(favoriteReq.getUser())</span>
+<span class="nc" id="L31">                .orElseThrow(() -&gt; new NoSuchElementException(&quot;User not found&quot;));</span>
+
+<span class="nc" id="L33">        Favorite favorite = new Favorite(user, favoriteReq.getProduct());</span>
+
+        try {
+<span class="nc" id="L36">            return new ResponseEntity&lt;&gt;(favoriteService.addFavorite(favorite), HttpStatus.CREATED);</span>
+<span class="nc" id="L37">        } catch (Exception e) {</span>
+<span class="nc" id="L38">            return new ResponseEntity&lt;&gt;(&quot;Ops! Seems like database is down. Try again later!&quot;, HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    @DeleteMapping()
+    public ResponseEntity&lt;String&gt; deleteFavorite(@RequestBody FavoriteRequest favoriteReq) {
+        try {
+<span class="nc" id="L45">            favoriteService.deleteFavorite(favoriteReq.getUser(), favoriteReq.getProduct());</span>
+<span class="nc" id="L46">            return new ResponseEntity&lt;&gt;(&quot;Favorite deleted successfully&quot;, HttpStatus.OK);</span>
+<span class="nc" id="L47">        } catch (Exception e) {</span>
+<span class="nc" id="L48">            return new ResponseEntity&lt;&gt;(&quot;User not found&quot;, HttpStatus.NOT_FOUND);</span>
+        }
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;?&gt; searchUserFavorites(@PathVariable long id) {
+        try {
+<span class="nc" id="L55">            return new ResponseEntity&lt;&gt;(favoriteService.searchUserFavorites(id), HttpStatus.OK);</span>
+<span class="nc" id="L56">        } catch (Exception e) {</span>
+<span class="nc" id="L57">            return new ResponseEntity&lt;&gt;(&quot;User not found&quot;, HttpStatus.NOT_FOUND);</span>
+        }
+    }
+
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;String&gt; deleteFavoriteByProduct(@PathVariable long id) {
+<span class="nc" id="L63">        favoriteService.deleteFavoriteByProduct(id);</span>
+<span class="nc" id="L64">        return ResponseEntity.ok(&quot;Favorites deleted successfully&quot;);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
