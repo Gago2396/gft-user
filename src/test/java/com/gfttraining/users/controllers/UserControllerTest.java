@@ -216,18 +216,6 @@ class UserControllerTest {
 
         long userId = 1L;
 
-        // User
-//        User updatedUser = new User();
-//        updatedUser.setId(userId);
-//        updatedUser.setName("Updated John");
-//        updatedUser.setLastName("Updated Doe");
-
-        // UserRequest
-//        UserRequest updatedUserRequest = new UserRequest();
-//        updatedUserRequest.setId(userId);
-//        updatedUserRequest.setName("Updated John");
-//        updatedUserRequest.setLastName("Updated Doe");
-
         ResponseEntity<User> expectedResponse = new ResponseEntity<>(updatedTestUser, HttpStatus.OK);
 
         when(userService.updateUserById(userId, updatedUserRequest)).thenReturn(expectedResponse.getBody());
