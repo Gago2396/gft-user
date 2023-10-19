@@ -171,6 +171,8 @@ class UserControllerTest {
         System.out.println("User found by ID: " + testUser.getId());
     }
 
+    //ToDo: negative testGetUserById
+
     @Test
     @DisplayName("Testing that a User entity can be deleted by ID")
     void testDeleteUserById() {
@@ -208,6 +210,40 @@ class UserControllerTest {
         verify(userService, times(1)).deleteUserById(userId);
 
         System.out.println("User deletion failed as expected.");
+    }
+
+    @Test
+    @DisplayName("Get User by name")
+    void testGetUserByName() {
+        String userName = "Antonio";
+
+        when(userService.getUserByName(userName)).thenReturn(Arrays.asList(testUser, testUser, testUser));
+
+        ResponseEntity<?> responseEntity = userController.getUserByName(userName);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(Arrays.asList(testUser, testUser, testUser), responseEntity.getBody());
+
+        verify(userService, times(1)).getUserByName(userName);
+
+        System.out.println("User found by Name: " + testUser.getName());
+    }
+
+    @Test
+    @DisplayName("Test search by name empty")
+    void testGetUserByNameError() {
+        String userName = "ErrorUser";
+
+        when(userService.getUserByName(userName)).thenReturn(Arrays.asList());
+
+        ResponseEntity<?> responseEntity = userController.getUserByName(userName);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(Arrays.asList(), responseEntity.getBody());
+
+        verify(userService, times(1)).getUserByName(userName);
+
+        System.out.println("User not found so empty list was returned");
     }
 
     @Test
@@ -289,4 +325,16 @@ class UserControllerTest {
         System.out.println("Loading users failed as expected.");
     }
 
+    @Test
+    @DisplayName("Get list of users")
+    void testGetListOfUsers() {
+        when(userService.getListOfUsers()).thenReturn(Arrays.asList(testUser, testUser, testUser));
+
+        ResponseEntity<?> responseEntity = userController.getListOfUsers();
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(Arrays.asList(testUser, testUser, testUser), responseEntity.getBody());
+
+        verify(userService, times(1)).getListOfUsers();
+    }
 }

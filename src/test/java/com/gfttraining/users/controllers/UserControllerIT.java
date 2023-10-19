@@ -25,7 +25,18 @@ public class UserControllerIT {
     @Test
     @DisplayName("Create User")
     public void testCreateUser() {
-        UserRequest userRequest = new UserRequest(1L, "John", "Doe", "123 Main St", "PayPal", 100, 75.0);
+        UserRequest userRequest = new UserRequest(
+                "John",
+                "Doe",
+                "123 Main St",
+                "City",
+                "Province",
+                12345,
+                "Country",
+                "PayPal",
+                100,
+                75.0
+        );
 
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<UserRequest> requestEntity = new HttpEntity<>(userRequest, headers);
