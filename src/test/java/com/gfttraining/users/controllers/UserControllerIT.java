@@ -33,7 +33,7 @@ public class UserControllerIT {
                 "City",
                 "Province",
                 12345,
-                "Country",
+                "Spain",
                 "PayPal",
                 100,
                 75.0
@@ -55,7 +55,7 @@ public class UserControllerIT {
         assertEquals(createdUser.getAddress().getCity(), "City");
         assertEquals(createdUser.getAddress().getProvince(), "Province");
         assertEquals(createdUser.getAddress().getPostalCode(), 12345);
-        assertEquals(createdUser.getAddress().getCountry(), "Country");
+        assertEquals(createdUser.getAddress().getCountry().getName(), "Spain");
         assertEquals(createdUser.getPaymentMethod().getName(), "PayPal");
         assertEquals(createdUser.getFidelityPoints(), 100);
         assertEquals(createdUser.getAveragePurchase(), 75.0);
