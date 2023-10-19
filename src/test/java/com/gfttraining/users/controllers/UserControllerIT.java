@@ -209,4 +209,5 @@ public class UserControllerIT {
 
         assertEquals("User deleted successfully", responseEntity.getBody());
     }
+
 }
