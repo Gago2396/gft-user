@@ -48,6 +48,21 @@ public class UserControllerIT {
     }
 
     @Test
+    @DisplayName("Create User - Negative Test")
+    public void testCreateUserNegative() {
+        UserRequest userRequest = new UserRequest(1L, "John","Doe", "123 Main St", "PayPal", 100, 75.0);
+
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<UserRequest> requestEntity = new HttpEntity<>(userRequest, headers);
+
+        ResponseEntity<User> responseEntity = restTemplate.exchange("/users", HttpMethod.POST, requestEntity, User.class);
+
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+
+        assertNull(responseEntity.getBody());
+    }
+
+    @Test
     @DisplayName("Update User by ID")
     public void testUpdateUserById() {
         long userId = 1L;
@@ -133,5 +148,20 @@ public class UserControllerIT {
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
         String responseBody = responseEntity.getBody();
+    }
+
+    @Test
+    @DisplayName("Delete User by ID")
+    public void testDeleteUserById() {
+        long userIdToDelete = 1L;
+
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<Object> requestEntity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> responseEntity = restTemplate.exchange("/users/" + userIdToDelete, HttpMethod.DELETE, requestEntity, String.class);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+        assertEquals("User deleted successfully", responseEntity.getBody());
     }
 }
