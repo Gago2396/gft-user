@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+/htmlReport/com.gfttraining.users.services/AddressService.html
+/htmlReport/com.gfttraining.users.services/AddressService.java.html
+/htmlReport/com.gfttraining.users.services/CountryService.html
+/htmlReport/com.gfttraining.users.services/CountryService.java.html
