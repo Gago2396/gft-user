@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FavoriteResponse {
+public class FavoriteDTO {
     private User user;
     private List<Long> favorites;
 }

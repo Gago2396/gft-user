@@ -35,16 +35,10 @@ public class UserService {
     }
 
     public PaymentMethod findPaymentMethod(String paymentMethodName) {
-        try {
             return paymentMethodService
                     .getPaymentMethodByName(paymentMethodName)
-                    .orElseThrow(() -> new PaymentMethodNotFoundException("PaymentMethod not found"));
-        } catch (PaymentMethodNotFoundException e) {
-            throw e;
-        }
+                    .orElseThrow(() -> new NoSuchElementException("PaymentMethod not found"));
     }
-
-
 
     public User createUser(UserRequest userRequest) {
         User user = parseUser(userRequest);
@@ -52,7 +46,7 @@ public class UserService {
     }
 
     public void deleteUserById(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("No user found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("User not found"));
         favoriteRepository.deleteByUser(user);
         userRepository.deleteById(id);
     }
@@ -95,8 +89,8 @@ public class UserService {
         return userRepository.saveAll(usersToLoad);
     }
 
-    public Optional<User> getUserById(long id) {
-        return userRepository.findById(id);
+    public User getUserById(long id) {
+        return userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("User not found"));
     }
 
     public Optional<List<User>> getUserByName(String name) {
