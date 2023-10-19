@@ -1,6 +1,7 @@
 package com.gfttraining.users.services;
 
 import com.gfttraining.users.exceptions.CountryNotFoundException;
+import com.gfttraining.users.exceptions.NoUsersWithThatNameException;
 import com.gfttraining.users.exceptions.PaymentMethodNotFoundException;
 import com.gfttraining.users.models.*;
 import com.gfttraining.users.repositories.FavoriteRepository;
@@ -21,7 +22,6 @@ public class UserService {
     private final PaymentMethodService paymentMethodService;
     private final FavoriteRepository favoriteRepository;
 
-
     public UserService(UserRepository userRepository, CountryService countryService, AddressService addressService, PaymentMethodService paymentMethodService, FavoriteRepository favoriteRepository) {
         this.userRepository = userRepository;
         this.countryService = countryService;
@@ -30,13 +30,19 @@ public class UserService {
         this.favoriteRepository = favoriteRepository;
     }
 
+    public PaymentMethod findPaymentMethod(String paymentMethodName) {
+        return paymentMethodService
+                .getPaymentMethodByName(paymentMethodName)
+                .orElseThrow(() -> new NoSuchElementException("PaymentMethod not found"));
+    }
+
     public User createUser(UserRequest userRequest) {
         User user = parseUser(userRequest);
         return userRepository.save(user);
     }
 
     public void deleteUserById(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("No user found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("User not found"));
         favoriteRepository.deleteByUser(user);
         userRepository.deleteById(id);
     }
@@ -88,16 +94,13 @@ public class UserService {
         return userRepository.saveAll(usersToLoad);
     }
 
-    public Optional<User> getUserById(long id) {
-        return userRepository.findById(id);
+    public User getUserById(long id) {
+        return userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("User not found"));
     }
 
-    public Optional<List<User>> getUserByName(String name) {
-        return userRepository.findByName(name);
-    }
-
-    public Favorite addFavorite(Favorite favorite) {
-        return null;
+    public List<User> getUserByName(String name) {
+     //ToDo: Refactor
+        return userRepository.findByName(name).orElseThrow(() -> new NoUsersWithThatNameException("User not found"));
     }
 
     public List<User> getListOfUsers() {
