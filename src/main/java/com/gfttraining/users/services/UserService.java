@@ -22,10 +22,10 @@ public class UserService {
     private final UserRepository userRepository;
 
     private final PaymentMethodRepository paymentMethodRepository;
-  
+
     private final PaymentMethodService paymentMethodService;
     private final FavoriteRepository favoriteRepository;
-    
+
 
     public UserService(UserRepository userRepository, PaymentMethodRepository paymentMethodRepository, PaymentMethodService paymentMethodService, FavoriteRepository favoriteRepository) {
         this.userRepository = userRepository;
@@ -35,9 +35,9 @@ public class UserService {
     }
 
     public PaymentMethod findPaymentMethod(String paymentMethodName) {
-            return paymentMethodService
-                    .getPaymentMethodByName(paymentMethodName)
-                    .orElseThrow(() -> new NoSuchElementException("PaymentMethod not found"));
+        return paymentMethodService
+                .getPaymentMethodByName(paymentMethodName)
+                .orElseThrow(() -> new NoSuchElementException("PaymentMethod not found"));
     }
 
     public User createUser(UserRequest userRequest) {
@@ -62,7 +62,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User parseUser(UserRequest userRequest){
+    public User parseUser(UserRequest userRequest) {
 
         PaymentMethod paymentMethod = findPaymentMethod(userRequest.getPaymentMethod());
 

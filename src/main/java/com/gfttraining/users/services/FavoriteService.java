@@ -48,6 +48,7 @@ public class FavoriteService {
     }
 
     public void deleteFavoriteByProduct(Long productId) {
+//        ToDo: Add NOT_FOUND response when microservices are connected
         favoriteRepository.deleteByProduct(productId);
     }
 }
