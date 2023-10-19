@@ -15,11 +15,6 @@ public class PaymentMethodService {
         this.paymentMethodRepository = paymentMethodRepository;
     }
 
-//    public PaymentMethod getPaymentMethodByName(long id, PaymentMethod paymentMethod) {
-//        // ToDo: Implement GET logic here and return the PaymentMethod
-//        return null;
-//    }
-
     public Optional<PaymentMethod> getPaymentMethodByName(String paymentMethodName) {
         return paymentMethodRepository.findByName(paymentMethodName);
     }

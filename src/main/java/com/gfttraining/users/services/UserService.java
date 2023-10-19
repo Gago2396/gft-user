@@ -1,14 +1,11 @@
 package com.gfttraining.users.services;
 
+import com.gfttraining.users.exceptions.CountryNotFoundException;
+import com.gfttraining.users.exceptions.NoUsersWithThatNameException;
 import com.gfttraining.users.exceptions.PaymentMethodNotFoundException;
-import com.gfttraining.users.models.Favorite;
-import com.gfttraining.users.models.PaymentMethod;
-import com.gfttraining.users.models.User;
-import com.gfttraining.users.models.UserRequest;
+import com.gfttraining.users.models.*;
 import com.gfttraining.users.repositories.FavoriteRepository;
-import com.gfttraining.users.repositories.PaymentMethodRepository;
 import com.gfttraining.users.repositories.UserRepository;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,31 +17,24 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
-
-    private final PaymentMethodRepository paymentMethodRepository;
-  
+    private final CountryService countryService;
+    private final AddressService addressService;
     private final PaymentMethodService paymentMethodService;
     private final FavoriteRepository favoriteRepository;
-    
 
-    public UserService(UserRepository userRepository, PaymentMethodRepository paymentMethodRepository, PaymentMethodService paymentMethodService, FavoriteRepository favoriteRepository) {
+    public UserService(UserRepository userRepository, CountryService countryService, AddressService addressService, PaymentMethodService paymentMethodService, FavoriteRepository favoriteRepository) {
         this.userRepository = userRepository;
-        this.paymentMethodRepository = paymentMethodRepository;
+        this.countryService = countryService;
+        this.addressService = addressService;
         this.paymentMethodService = paymentMethodService;
         this.favoriteRepository = favoriteRepository;
     }
 
     public PaymentMethod findPaymentMethod(String paymentMethodName) {
-        try {
-            return paymentMethodService
-                    .getPaymentMethodByName(paymentMethodName)
-                    .orElseThrow(() -> new PaymentMethodNotFoundException("PaymentMethod not found"));
-        } catch (PaymentMethodNotFoundException e) {
-            throw e;
-        }
+        return paymentMethodService
+                .getPaymentMethodByName(paymentMethodName)
+                .orElseThrow(() -> new NoSuchElementException("PaymentMethod not found"));
     }
-
-
 
     public User createUser(UserRequest userRequest) {
         User user = parseUser(userRequest);
@@ -52,7 +42,7 @@ public class UserService {
     }
 
     public void deleteUserById(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("No user found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("User not found"));
         favoriteRepository.deleteByUser(user);
         userRepository.deleteById(id);
     }
@@ -68,14 +58,23 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User parseUser(UserRequest userRequest){
+    public User parseUser(UserRequest userRequest) {
 
-        PaymentMethod paymentMethod = findPaymentMethod(userRequest.getPaymentMethod());
+        PaymentMethod paymentMethod = paymentMethodService.getPaymentMethodByName(userRequest.getPaymentMethod())
+                .orElseThrow(() -> new PaymentMethodNotFoundException("Payment method not valid"));
+
+        Country country = countryService.getCountryByName(userRequest.getCountry())
+                .orElseThrow(() -> new CountryNotFoundException("Country not found"));
+
+        AddressRequest addressRequest = new AddressRequest(userRequest.getStreet(), userRequest.getCity(), userRequest.getProvince(), userRequest.getPostalCode(), country);
+
+        Address address = addressService.parseAddress(addressRequest);
+        addressService.addAddress(address);
 
         User user = new User();
         user.setName(userRequest.getName());
         user.setLastName(userRequest.getLastName());
-        user.setAddress(userRequest.getAddress());
+        user.setAddress(address);
         user.setFidelityPoints(userRequest.getFidelityPoints());
         user.setAveragePurchase(userRequest.getAveragePurchase());
         user.setPaymentMethod(paymentMethod);
@@ -95,16 +94,13 @@ public class UserService {
         return userRepository.saveAll(usersToLoad);
     }
 
-    public Optional<User> getUserById(long id) {
-        return userRepository.findById(id);
+    public User getUserById(long id) {
+        return userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("User not found"));
     }
 
-    public Optional<List<User>> getUserByName(String name) {
-        return userRepository.findByName(name);
-    }
-
-    public Favorite addFavorite(Favorite favorite) {
-        return null;
+    public List<User> getUserByName(String name) {
+     //ToDo: Refactor
+        return userRepository.findByName(name).orElseThrow(() -> new NoUsersWithThatNameException("User not found"));
     }
 
     public List<User> getListOfUsers() {
