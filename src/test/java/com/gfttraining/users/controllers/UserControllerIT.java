@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,18 @@ public class UserControllerIT {
     @Test
     @DisplayName("Create User")
     public void testCreateUser() {
-        UserRequest userRequest = new UserRequest(1L, "John", "Doe", "123 Main St", "PayPal", 100, 75.0);
+        UserRequest userRequest = new UserRequest(
+                "John",
+                "Doe",
+                "123 Main St",
+                "City",
+                "Province",
+                12345,
+                "Spain",
+                "PayPal",
+                100,
+                75.0
+        );
 
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<UserRequest> requestEntity = new HttpEntity<>(userRequest, headers);
@@ -39,11 +51,14 @@ public class UserControllerIT {
         assertNotNull(createdUser);
         assertEquals(createdUser.getName(), "John");
         assertEquals(createdUser.getLastName(), "Doe");
-        assertEquals(createdUser.getAddress(), "123 Main St");
+        assertEquals(createdUser.getAddress().getStreet(), "123 Main St");
+        assertEquals(createdUser.getAddress().getCity(), "City");
+        assertEquals(createdUser.getAddress().getProvince(), "Province");
+        assertEquals(createdUser.getAddress().getPostalCode(), 12345);
+        assertEquals(createdUser.getAddress().getCountry().getName(), "Spain");
         assertEquals(createdUser.getPaymentMethod().getName(), "PayPal");
         assertEquals(createdUser.getFidelityPoints(), 100);
         assertEquals(createdUser.getAveragePurchase(), 75.0);
-
     }
 
     @Test
@@ -51,21 +66,56 @@ public class UserControllerIT {
     public void testUpdateUserById() {
         long userId = 1L;
 
-        UserRequest updatedUserRequest = new UserRequest(2L, "Josh", "Dowe", "123 Main St", "PayPal", 100, 75.0);
+        UserRequest userRequest = new UserRequest(
+                "John",
+                "Doe",
+                "123 Main St",
+                "City",
+                "Province",
+                12345,
+                "Spain",
+                "PayPal",
+                100,
+                75.0
+        );
 
         HttpHeaders headers = new HttpHeaders();
-        HttpEntity<UserRequest> requestEntity = new HttpEntity<>(updatedUserRequest, headers);
+        HttpEntity<UserRequest> requestEntity = new HttpEntity<>(userRequest, headers);
 
         ResponseEntity<User> responseEntity = restTemplate.exchange("/users/" + userId, HttpMethod.PUT, requestEntity, User.class);
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
         User updatedUser = responseEntity.getBody();
-        assertEquals(updatedUser.getName(), "Josh");
-        assertEquals(updatedUser.getLastName(), "Dowe");
+        assertEquals(updatedUser.getName(), "John");
+        assertEquals(updatedUser.getLastName(), "Doe");
+        assertEquals(updatedUser.getAddress().getStreet(), "123 Main St");
+        assertEquals(updatedUser.getAddress().getCity(), "City");
+        assertEquals(updatedUser.getAddress().getProvince(), "Province");
+        assertEquals(updatedUser.getAddress().getPostalCode(), 12345);
+        assertEquals(updatedUser.getAddress().getCountry().getName(), "Spain");
+        assertEquals(updatedUser.getPaymentMethod().getName(), "PayPal");
+        assertEquals(updatedUser.getFidelityPoints(), 100);
+        assertEquals(updatedUser.getAveragePurchase(), 75.0);
+
     }
 
-    //ToDo: Negative POST User
+    @Test
+    @DisplayName("Update User by ID - Negative Test")
+    public void testUpdateUserByIdNegative() {
+        long nonExistentUserId = 9999L;
+
+        UserRequest updatedUserRequest = new UserRequest("UpdatedName", "UpdatedLastName", "UpdatedAddress", "UpdatedCity", "UpdatedProvince", 54321, "UpdatedCountry", "UpdatedPaymentMethod", 300, 90.0);
+
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<UserRequest> requestEntity = new HttpEntity<>(updatedUserRequest, headers);
+
+        ResponseEntity<String> responseEntity = restTemplate.exchange("/users/" + nonExistentUserId, HttpMethod.PUT, requestEntity, String.class);
+
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+
+        assertEquals("User not found", responseEntity.getBody());
+    }
 
     @Test
     @DisplayName("Get User by id")
@@ -84,20 +134,22 @@ public class UserControllerIT {
 
         assertEquals("John", user.getName());
         assertEquals("Doe", user.getLastName());
-        assertEquals("1234 Elm St", user.getAddress());
+        assertEquals("Sunset Blvd", user.getAddress().getStreet());
+        assertEquals("Barcelona", user.getAddress().getCity());
+        assertEquals("Catalonia", user.getAddress().getProvince());
+        assertEquals(12345, user.getAddress().getPostalCode());
+        assertEquals("Spain", user.getAddress().getCountry());
         assertEquals("Credit Card", user.getPaymentMethod().getName());
         assertEquals(100, user.getFidelityPoints());
         assertEquals(75.50, user.getAveragePurchase(), 0.001);
     }
 
-    //ToDo: Negative GET User
-
     @Test
     @DisplayName("Load List of Users")
     public void testLoadListOfUsers() {
         List<UserRequest> userRequestList = new ArrayList<>();
-        userRequestList.add(new UserRequest(2L,"John", "Doe", "123 Main St", "PayPal", 100, 75.0));
-        userRequestList.add(new UserRequest(3L, "Alice", "Johnson", "456 Elm St", "Credit Card", 200, 50.0));
+        userRequestList.add(new UserRequest("John", "Doe", "123 Main St", "City", "Province", 12345, "Spain", "PayPal", 100, 75.0));
+        userRequestList.add(new UserRequest("Alice", "Johnson", "456 Elm St", "Another City", "Another Province", 54321, "Estonia", "Credit Card", 200, 50.0));
 
         HttpEntity<List<UserRequest>> requestEntity = new HttpEntity<>(userRequestList);
 
@@ -112,16 +164,50 @@ public class UserControllerIT {
 
         assertEquals("John", savedUsers.get(0).getName());
         assertEquals("Doe", savedUsers.get(0).getLastName());
-        assertEquals("123 Main St", savedUsers.get(0).getAddress());
+        assertEquals("123 Main St", savedUsers.get(0).getAddress().getStreet());
+        assertEquals("City", savedUsers.get(0).getAddress().getCity());
+        assertEquals("Province", savedUsers.get(0).getAddress().getProvince());
+        assertEquals(12345, savedUsers.get(0).getAddress().getPostalCode());
+        assertEquals("Spain", savedUsers.get(0).getAddress().getCountry().getName());
         assertEquals("PayPal", savedUsers.get(0).getPaymentMethod().getName());
         assertEquals(100, savedUsers.get(0).getFidelityPoints());
         assertEquals(75.0, savedUsers.get(0).getAveragePurchase());
 
         assertEquals("Alice", savedUsers.get(1).getName());
         assertEquals("Johnson", savedUsers.get(1).getLastName());
-        assertEquals("456 Elm St", savedUsers.get(1).getAddress());
+        assertEquals("456 Elm St", savedUsers.get(1).getAddress().getStreet());
+        assertEquals("Another City", savedUsers.get(1).getAddress().getCity());
+        assertEquals("Another Province", savedUsers.get(1).getAddress().getProvince());
+        assertEquals(54321, savedUsers.get(1).getAddress().getPostalCode());
+        assertEquals("Estonia", savedUsers.get(1).getAddress().getCountry().getName());
         assertEquals("Credit Card", savedUsers.get(1).getPaymentMethod().getName());
         assertEquals(200, savedUsers.get(1).getFidelityPoints());
         assertEquals(50.0, savedUsers.get(1).getAveragePurchase());
     }
+
+    @Test
+    @DisplayName("List of Users")
+    public void testGetListOfUsers() {
+        ResponseEntity<String> responseEntity = restTemplate.getForEntity("/users/list", String.class);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+        String responseBody = responseEntity.getBody();
+    }
+
+    @Test
+    @DisplayName("Delete User by ID")
+    public void testDeleteUserById() {
+        long userIdToDelete = 1L;
+
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<Object> requestEntity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> responseEntity = restTemplate.exchange("/users/" + userIdToDelete, HttpMethod.DELETE, requestEntity, String.class);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+        assertEquals("User deleted successfully", responseEntity.getBody());
+    }
+
 }
