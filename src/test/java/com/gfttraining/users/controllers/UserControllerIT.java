@@ -67,16 +67,16 @@ public class UserControllerIT {
         long userId = 1L;
 
         UserRequest updatedUserRequest = new UserRequest(
-                "Josh",
-                "Dowe",
+                "John",
+                "Doe",
                 "123 Main St",
-                "UpdatedCity",
-                "UpdatedProvince",
-                54321,
-                "UpdatedCountry",
-                "UpdatedPaymentMethod",
-                200,
-                85.0
+                "City",
+                "Province",
+                12345,
+                "Spain",
+                "PayPal",
+                100,
+                75.0
         );
 
         HttpHeaders headers = new HttpHeaders();
@@ -87,16 +87,16 @@ public class UserControllerIT {
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
         User updatedUser = responseEntity.getBody();
-        assertEquals(updatedUser.getName(), "Josh");
-        assertEquals(updatedUser.getLastName(), "Dowe");
+        assertEquals(updatedUser.getName(), "John");
+        assertEquals(updatedUser.getLastName(), "Doe");
         assertEquals(updatedUser.getAddress().getStreet(), "123 Main St");
-        assertEquals(updatedUser.getAddress().getCity(), "UpdatedCity");
-        assertEquals(updatedUser.getAddress().getProvince(), "UpdatedProvince");
-        assertEquals(updatedUser.getAddress().getPostalCode(), 54321);
-        assertEquals(updatedUser.getAddress().getCountry(), "UpdatedCountry");
-        assertEquals(updatedUser.getPaymentMethod().getName(), "UpdatedPaymentMethod");
-        assertEquals(updatedUser.getFidelityPoints(), 200);
-        assertEquals(updatedUser.getAveragePurchase(), 85.0);
+        assertEquals(updatedUser.getAddress().getCity(), "City");
+        assertEquals(updatedUser.getAddress().getProvince(), "Province");
+        assertEquals(updatedUser.getAddress().getPostalCode(), 12345);
+        assertEquals(updatedUser.getAddress().getCountry().getName(), "Spain");
+        assertEquals(updatedUser.getPaymentMethod().getName(), "Paypal");
+        assertEquals(updatedUser.getFidelityPoints(), 100);
+        assertEquals(updatedUser.getAveragePurchase(), 75.0);
     }
 
     @Test
@@ -134,10 +134,10 @@ public class UserControllerIT {
         assertEquals("John", user.getName());
         assertEquals("Doe", user.getLastName());
         assertEquals("1234 Elm St", user.getAddress());
-        assertEquals("City", user.getAddress().getCity());               // Nuevo campo: Ciudad
-        assertEquals("Province", user.getAddress().getProvince());       // Nuevo campo: Provincia
-        assertEquals(12345, user.getAddress().getPostalCode());           // Nuevo campo: Código Postal
-        assertEquals("Country", user.getAddress().getCountry());         // Nuevo campo: País
+        assertEquals("City", user.getAddress().getCity());
+        assertEquals("Province", user.getAddress().getProvince());
+        assertEquals(12345, user.getAddress().getPostalCode());
+        assertEquals("Spain", user.getAddress().getCountry());
         assertEquals("Credit Card", user.getPaymentMethod().getName());
         assertEquals(100, user.getFidelityPoints());
         assertEquals(75.50, user.getAveragePurchase(), 0.001);
