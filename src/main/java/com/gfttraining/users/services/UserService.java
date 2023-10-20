@@ -61,7 +61,7 @@ public class UserService {
     public User parseUser(UserRequest userRequest) {
 
         PaymentMethod paymentMethod = paymentMethodService.getPaymentMethodByName(userRequest.getPaymentMethod())
-                .orElseThrow(() -> new PaymentMethodNotFoundException("Payment method not valid"));
+                .orElseThrow(() -> new PaymentMethodNotFoundException("Payment method not valid: " + userRequest.getPaymentMethod()));
 
         Country country = countryService.getCountryByName(userRequest.getCountry())
                 .orElseThrow(() -> new CountryNotFoundException("Country not found"));

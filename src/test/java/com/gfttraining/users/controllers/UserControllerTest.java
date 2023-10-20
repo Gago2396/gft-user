@@ -28,7 +28,7 @@ class UserControllerTest {
     @Mock
     private UserService userService;
 
-    private UserRequest testUserRequest;
+    private UserRequest userRequest;
 
     private UserRequest updatedUserRequest;
 
@@ -95,7 +95,7 @@ class UserControllerTest {
         updatedTestUser.setAveragePurchase(120.0);
 
         // UserRequest
-        UserRequest userRequest = new UserRequest();
+        userRequest = new UserRequest();
         userRequest.setName("Antonio");
         userRequest.setLastName("Garcia");
         userRequest.setStreet("23 Mayor");
@@ -125,14 +125,14 @@ class UserControllerTest {
     @DisplayName("Testing that a User can be created")
     void testCreateUser() {
         ResponseEntity<User> expectedResponse = new ResponseEntity<>(testUser, HttpStatus.CREATED);
-        when(userService.createUser(testUserRequest)).thenReturn(expectedResponse.getBody());
+        when(userService.createUser(userRequest)).thenReturn(expectedResponse.getBody());
 
-        ResponseEntity<?> responseEntity = userController.createUser(testUserRequest);
+        ResponseEntity<?> responseEntity = userController.createUser(userRequest);
 
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
         assertEquals(testUser, responseEntity.getBody());
 
-        verify(userService, times(1)).createUser(testUserRequest);
+        verify(userService, times(1)).createUser(userRequest);
 
         System.out.println("User created: " + testUser.getName());
     }
@@ -142,14 +142,14 @@ class UserControllerTest {
     @Test
     @DisplayName("Testing that a User entity can give a INTERNAL_SERVER_ERROR while creating a USER")
     void testCreateUserError() {
-        when(userService.createUser(testUserRequest)).thenReturn(null);
+        when(userService.createUser(userRequest)).thenReturn(null);
 
-        ResponseEntity<?> responseEntity = userController.createUser(testUserRequest);
+        ResponseEntity<?> responseEntity = userController.createUser(userRequest);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
         assertNull(responseEntity.getBody());
 
-        verify(userService, times(1)).createUser(testUserRequest);
+        verify(userService, times(1)).createUser(userRequest);
 
         System.out.println("User creation failed as expected.");
     }
@@ -290,7 +290,7 @@ class UserControllerTest {
     @Test
     @DisplayName("Testing to load a list of Users")
     void testLoadListOfUsers() {
-        List<UserRequest> userRequestList = Arrays.asList(testUserRequest, testUserRequest, testUserRequest);
+        List<UserRequest> userRequestList = Arrays.asList(userRequest, userRequest, userRequest);
 
         List<User> userList = Arrays.asList(testUser, testUser, testUser);
 
@@ -311,7 +311,7 @@ class UserControllerTest {
     @DisplayName("Testing that a User entity can give a INTERNAL_SERVER_ERROR while loading a list of USERS")
     @Disabled
     void testLoadListOfUsersError() {
-        List<UserRequest> userRequestList = Arrays.asList(testUserRequest, testUserRequest, testUserRequest);
+        List<UserRequest> userRequestList = Arrays.asList(userRequest, userRequest, userRequest);
 
         when(userService.loadListOfUsers(userRequestList)).thenReturn(null);
 
