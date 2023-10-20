@@ -5,6 +5,7 @@ import com.gfttraining.users.models.UserRequest;
 import com.gfttraining.users.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
+@Validated
 @RequestMapping("/users")
 public class UserController {
 
@@ -38,7 +40,7 @@ public class UserController {
     }
 
     @PostMapping("/load")
-    public ResponseEntity<?> loadListOfUsers(@RequestBody @Valid List<UserRequest> userRequestList) {
+    public ResponseEntity<?> loadListOfUsers(@RequestBody List<@Valid UserRequest> userRequestList) {
         return new ResponseEntity<>(userService.loadListOfUsers(userRequestList), HttpStatus.CREATED);
     }
 
