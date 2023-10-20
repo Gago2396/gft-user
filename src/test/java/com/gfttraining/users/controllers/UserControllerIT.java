@@ -66,7 +66,7 @@ public class UserControllerIT {
     public void testUpdateUserById() {
         long userId = 1L;
 
-        UserRequest updatedUserRequest = new UserRequest(
+        UserRequest userRequest = new UserRequest(
                 "John",
                 "Doe",
                 "123 Main St",
@@ -80,7 +80,7 @@ public class UserControllerIT {
         );
 
         HttpHeaders headers = new HttpHeaders();
-        HttpEntity<UserRequest> requestEntity = new HttpEntity<>(updatedUserRequest, headers);
+        HttpEntity<UserRequest> requestEntity = new HttpEntity<>(userRequest, headers);
 
         ResponseEntity<User> responseEntity = restTemplate.exchange("/users/" + userId, HttpMethod.PUT, requestEntity, User.class);
 
@@ -94,9 +94,10 @@ public class UserControllerIT {
         assertEquals(updatedUser.getAddress().getProvince(), "Province");
         assertEquals(updatedUser.getAddress().getPostalCode(), 12345);
         assertEquals(updatedUser.getAddress().getCountry().getName(), "Spain");
-        assertEquals(updatedUser.getPaymentMethod().getName(), "Paypal");
+        assertEquals(updatedUser.getPaymentMethod().getName(), "PayPal");
         assertEquals(updatedUser.getFidelityPoints(), 100);
         assertEquals(updatedUser.getAveragePurchase(), 75.0);
+
     }
 
     @Test
@@ -133,17 +134,15 @@ public class UserControllerIT {
 
         assertEquals("John", user.getName());
         assertEquals("Doe", user.getLastName());
-        assertEquals("1234 Elm St", user.getAddress());
-        assertEquals("City", user.getAddress().getCity());
-        assertEquals("Province", user.getAddress().getProvince());
+        assertEquals("Sunset Blvd", user.getAddress().getStreet());
+        assertEquals("Barcelona", user.getAddress().getCity());
+        assertEquals("Catalonia", user.getAddress().getProvince());
         assertEquals(12345, user.getAddress().getPostalCode());
         assertEquals("Spain", user.getAddress().getCountry());
         assertEquals("Credit Card", user.getPaymentMethod().getName());
         assertEquals(100, user.getFidelityPoints());
         assertEquals(75.50, user.getAveragePurchase(), 0.001);
     }
-
-    //ToDo: Negative GET User
 
     @Test
     @DisplayName("Load List of Users")
@@ -187,6 +186,7 @@ public class UserControllerIT {
     }
 
     @Test
+    @DisplayName("List of Users")
     public void testGetListOfUsers() {
         ResponseEntity<String> responseEntity = restTemplate.getForEntity("/users/list", String.class);
 
