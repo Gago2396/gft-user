@@ -148,8 +148,8 @@ public class UserControllerIT {
     @DisplayName("Load List of Users")
     public void testLoadListOfUsers() {
         List<UserRequest> userRequestList = new ArrayList<>();
-        userRequestList.add(new UserRequest("John", "Doe", "123 Main St", "City", "Province", 12345, "Country", "PayPal", 100, 75.0));
-        userRequestList.add(new UserRequest("Alice", "Johnson", "456 Elm St", "Another City", "Another Province", 54321, "Another Country", "Credit Card", 200, 50.0));
+        userRequestList.add(new UserRequest("John", "Doe", "123 Main St", "City", "Province", 12345, "Spain", "PayPal", 100, 75.0));
+        userRequestList.add(new UserRequest("Alice", "Johnson", "456 Elm St", "Another City", "Another Province", 54321, "Estonia", "Credit Card", 200, 50.0));
 
         HttpEntity<List<UserRequest>> requestEntity = new HttpEntity<>(userRequestList);
 
@@ -168,7 +168,7 @@ public class UserControllerIT {
         assertEquals("City", savedUsers.get(0).getAddress().getCity());
         assertEquals("Province", savedUsers.get(0).getAddress().getProvince());
         assertEquals(12345, savedUsers.get(0).getAddress().getPostalCode());
-        assertEquals("Country", savedUsers.get(0).getAddress().getCountry());
+        assertEquals("Spain", savedUsers.get(0).getAddress().getCountry().getName());
         assertEquals("PayPal", savedUsers.get(0).getPaymentMethod().getName());
         assertEquals(100, savedUsers.get(0).getFidelityPoints());
         assertEquals(75.0, savedUsers.get(0).getAveragePurchase());
@@ -179,7 +179,7 @@ public class UserControllerIT {
         assertEquals("Another City", savedUsers.get(1).getAddress().getCity());
         assertEquals("Another Province", savedUsers.get(1).getAddress().getProvince());
         assertEquals(54321, savedUsers.get(1).getAddress().getPostalCode());
-        assertEquals("Another Country", savedUsers.get(1).getAddress().getCountry());
+        assertEquals("Estonia", savedUsers.get(1).getAddress().getCountry().getName());
         assertEquals("Credit Card", savedUsers.get(1).getPaymentMethod().getName());
         assertEquals(200, savedUsers.get(1).getFidelityPoints());
         assertEquals(50.0, savedUsers.get(1).getAveragePurchase());
