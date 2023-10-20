@@ -94,7 +94,7 @@ public class UserService {
         return userRepository.saveAll(usersToLoad);
     }
 
-    public User getUserById(long id) {
+    public User getUserById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("User not found"));
     }
 
