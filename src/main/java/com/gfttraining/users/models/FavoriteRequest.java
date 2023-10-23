@@ -3,6 +3,7 @@ package com.gfttraining.users.models;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 
 @Data
@@ -10,9 +11,10 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 public class FavoriteRequest {
 
-    @NotBlank(message = "User is required")
+    @NotNull(message = "User is required")
     private Long user;
-    @NotBlank(message = "Product is required")
+
+    @NotNull(message = "Product is required")
     private Long product;
 
 }

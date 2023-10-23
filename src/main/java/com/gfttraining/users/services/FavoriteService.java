@@ -33,12 +33,8 @@ public class FavoriteService {
         favoriteRepository.deleteById(id);
     }
 
-    public FavoriteDTO searchUserFavorites(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
-
-        List<Favorite> favList = favoriteRepository.findByUser(user)
-                .orElseThrow(() -> new NoSuchElementException("Favorites not found"));
+    public FavoriteDTO searchUserFavorites(User user) {
+        List<Favorite> favList = favoriteRepository.findByUser(user);
 
         List<Long> productIds = favList.stream()
                 .map(Favorite::getProduct)
