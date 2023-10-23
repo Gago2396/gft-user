@@ -118,7 +118,6 @@ public class UserControllerIT {
         assertEquals("User not found", responseEntity.getBody());
     }
 
-    @Disabled
     @Test
     @DisplayName("Get User by id")
     public void testGetUserById() {
@@ -140,7 +139,7 @@ public class UserControllerIT {
         assertEquals("Barcelona", user.getAddress().getCity());
         assertEquals("Catalonia", user.getAddress().getProvince());
         assertEquals(12345, user.getAddress().getPostalCode());
-        assertEquals("Spain", user.getAddress().getCountry());
+        assertEquals("Spain", user.getAddress().getCountry().getName());
         assertEquals("Credit Card", user.getPaymentMethod().getName());
         assertEquals(100, user.getFidelityPoints());
         assertEquals(75.50, user.getAveragePurchase(), 0.001);
