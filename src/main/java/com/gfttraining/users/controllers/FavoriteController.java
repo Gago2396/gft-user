@@ -34,7 +34,7 @@ public class FavoriteController {
     }
 
     @DeleteMapping()
-    public ResponseEntity<String> deleteFavorite(@RequestBody FavoriteRequest favoriteReq) {
+    public ResponseEntity<String> deleteFavorite(@RequestBody @Valid FavoriteRequest favoriteReq) {
         userService.getUserById(favoriteReq.getUser());
         favoriteService.deleteFavorite(favoriteReq.getUser(), favoriteReq.getProduct());
         return new ResponseEntity<>("Favorite deleted successfully", HttpStatus.OK);
@@ -42,7 +42,8 @@ public class FavoriteController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> searchUserFavorites(@PathVariable long id) {
-        return new ResponseEntity<>(favoriteService.searchUserFavorites(id), HttpStatus.OK);
+        User user = userService.getUserById(id);
+        return new ResponseEntity<>(favoriteService.searchUserFavorites(user), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

@@ -10,11 +10,11 @@ import java.util.Optional;
 public class CountryService {
     private final CountryRepository CountryRepository;
 
-    public CountryService(CountryRepository paymentMethodRepository) {
-        this.CountryRepository = paymentMethodRepository;
+    public CountryService(CountryRepository countryRepository) {
+        this.CountryRepository = countryRepository;
     }
 
-    public Optional<Country> getCountryByName(String paymentMethodName) {
-        return CountryRepository.findByName(paymentMethodName);
+    public Optional<Country> getCountryByName(String countryName) {
+        return CountryRepository.findByName(countryName);
     }
 }
