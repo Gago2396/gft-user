@@ -39,10 +39,9 @@ public class UserControllerAdvice {
     public ResponseEntity<String> NoSuchElementException(NoSuchElementException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
-
+    
     @ExceptionHandler(CountryNotFoundException.class)
     public ResponseEntity<String> CountryNotFoundException(CountryNotFoundException ex){
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
-
 }

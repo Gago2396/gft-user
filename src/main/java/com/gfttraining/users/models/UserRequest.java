@@ -18,7 +18,6 @@ public class UserRequest {
     private String city;
     private String province;
     private int postalCode;
-    @NotBlank(message = "Country is required")
     private String country;
     @NotBlank(message = "Payment Method is required")
     private String paymentMethod;

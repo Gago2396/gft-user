@@ -94,13 +94,15 @@ public class UserService {
         return userRepository.saveAll(usersToLoad);
     }
 
-    public User getUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("User not found"));
+    public User getUserById(long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("User not found"));
     }
 
     public List<User> getUserByName(String name) {
      //ToDo: Refactor
-        return userRepository.findByName(name).orElseThrow(() -> new NoUsersWithThatNameException("User not found"));
+        return userRepository.findByName(name)
+                .orElseThrow(() -> new NoUsersWithThatNameException("User not found"));
     }
 
     public List<User> getListOfUsers() {

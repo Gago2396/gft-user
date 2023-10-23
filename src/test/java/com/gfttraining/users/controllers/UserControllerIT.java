@@ -3,6 +3,7 @@ package com.gfttraining.users.controllers;
 import com.gfttraining.users.models.PaymentMethod;
 import com.gfttraining.users.models.User;
 import com.gfttraining.users.models.UserRequest;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class UserControllerIT {
-//anyassert
+    //anyassert
     @Autowired
     private TestRestTemplate restTemplate;
 
@@ -138,7 +139,7 @@ public class UserControllerIT {
         assertEquals("Barcelona", user.getAddress().getCity());
         assertEquals("Catalonia", user.getAddress().getProvince());
         assertEquals(12345, user.getAddress().getPostalCode());
-        assertEquals("Spain", user.getAddress().getCountry());
+        assertEquals("Spain", user.getAddress().getCountry().getName());
         assertEquals("Credit Card", user.getPaymentMethod().getName());
         assertEquals(100, user.getFidelityPoints());
         assertEquals(75.50, user.getAveragePurchase(), 0.001);
