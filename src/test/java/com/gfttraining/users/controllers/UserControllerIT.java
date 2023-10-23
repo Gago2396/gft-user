@@ -152,7 +152,7 @@ public class UserControllerIT {
     public void testGetUserByIdNegative() {
         long nonExistentUserId = 9999L;
 
-        ResponseEntity<User> responseEntity = restTemplate.getForEntity("/users/" + nonExistentUserId, User.class);
+        ResponseEntity<String> responseEntity = restTemplate.getForEntity("/users/" + nonExistentUserId, String.class);
 
         // Debería devolver un estado HTTP 404 (No encontrado) ya que el usuario no existe
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
