@@ -61,6 +61,9 @@ public class UserControllerIT {
         assertEquals(createdUser.getAveragePurchase(), 75.0);
     }
 
+    //@Test
+    //@DisplayName("Create User - Negative Test (Missing Name)")
+
     @Test
     @DisplayName("Update User by ID")
     public void testUpdateUserById() {
@@ -142,6 +145,17 @@ public class UserControllerIT {
         assertEquals("Credit Card", user.getPaymentMethod().getName());
         assertEquals(100, user.getFidelityPoints());
         assertEquals(75.50, user.getAveragePurchase(), 0.001);
+    }
+
+    @Test
+    @DisplayName("Get User by ID - Negative Test (User Not Found)")
+    public void testGetUserByIdNegative() {
+        long nonExistentUserId = 9999L;
+
+        ResponseEntity<User> responseEntity = restTemplate.getForEntity("/users/" + nonExistentUserId, User.class);
+
+        // Debería devolver un estado HTTP 404 (No encontrado) ya que el usuario no existe
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
     }
 
     @Test
