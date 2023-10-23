@@ -279,21 +279,6 @@ class UserServiceTest {
         verify(paymentMethodService, times(1)).getPaymentMethodByName(userRequest.getPaymentMethod());
     }
 
-//    //ToDo: Error: PaymentMethodNotFoundException is being thrown by error
-//    @Disabled
-//    @Test
-//    void parseUserErrorCountry() {
-//        doNothing().when(paymentMethodService.getPaymentMethodByName(userRequest.getPaymentMethod()));
-//        when(countryService.getCountryByName(userRequest.getCountry()))
-//                .thenThrow(new CountryNotFoundException("Country not valid"));
-//
-//        Throwable exception = assertThrows(CountryNotFoundException.class, () -> userService.parseUser(userRequest));
-//
-//        assertEquals("Country not valid", exception.getMessage());
-//
-//        verify(countryService, times(1)).getCountryByName(userRequest.getCountry());
-//    }
-
     @Test
     void loadListOfUsers() {
 
@@ -349,11 +334,11 @@ class UserServiceTest {
         String name = "Antonio";
 
         List<User> userList = Arrays.asList(testUser, testUser, testUser);
-        when(userRepository.findByName(name)).thenReturn((Optional.of(userList)));
+        when(userRepository.findByName(name)).thenReturn(Optional.of(userList));
 
-        Optional<List<User>> testList = userRepository.findByName(name);
+        List<User> result = userService.getUserByName(name);
 
-        User firstUser = testList.orElse(Collections.emptyList()).stream().findFirst().orElse(null);
+        User firstUser = result.stream().findFirst().orElse(null);
 
         assertEquals("Antonio", firstUser.getName());
         assertEquals("Garcia", firstUser.getLastName());
@@ -370,11 +355,13 @@ class UserServiceTest {
         when(userRepository.findByName(name))
                 .thenThrow(new NoUsersWithThatNameException("User not found"));
 
-        Throwable exception = assertThrows(NoUsersWithThatNameException.class, () -> userRepository.findByName(name));
+        Throwable exception = assertThrows(NoUsersWithThatNameException.class, () -> userService.getUserByName(name));
+
 
         assertEquals("User not found", exception.getMessage());
 
         verify(userRepository, times(1)).findByName(name);
 
     }
+
 }

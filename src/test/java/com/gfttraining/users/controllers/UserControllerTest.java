@@ -1,5 +1,6 @@
 package com.gfttraining.users.controllers;
 
+import com.gfttraining.users.exceptions.PaymentMethodNotFoundException;
 import com.gfttraining.users.models.*;
 import com.gfttraining.users.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -137,21 +139,20 @@ class UserControllerTest {
         System.out.println("User created: " + testUser.getName());
     }
 
-    //ToDo: Finish assert response when negative create is implemented
-    @Disabled
     @Test
     @DisplayName("Testing that a User entity can give a INTERNAL_SERVER_ERROR while creating a USER")
     void testCreateUserError() {
-        when(userService.createUser(userRequest)).thenReturn(null);
+        // GIVEN
+        UserRequest userToCreate = userRequest;
 
-        ResponseEntity<?> responseEntity = userController.createUser(userRequest);
+        // WHEN
+        doThrow(new PaymentMethodNotFoundException("Payment method not valid"))
+                .when(userService).createUser(userRequest);
 
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
-        assertNull(responseEntity.getBody());
-
-        verify(userService, times(1)).createUser(userRequest);
-
-        System.out.println("User creation failed as expected.");
+        // THEN
+        assertThrows(PaymentMethodNotFoundException.class, () -> {
+            userController.createUser(userToCreate);
+        });
     }
 
     @Test
@@ -171,7 +172,21 @@ class UserControllerTest {
         System.out.println("User found by ID: " + testUser.getId());
     }
 
-    //ToDo: negative testGetUserById
+    @Test
+    @DisplayName("Get User by id")
+    void testGetUserByIdError() {
+        // GIVEN
+        long userId = 1L;
+
+        // WHEN
+        when(userService.getUserById(userId))
+                .thenThrow(new NoSuchElementException("User not found"));
+
+        // THEN
+        assertThrows(NoSuchElementException.class, () -> {
+            userController.getUserById(userId);
+        });
+    }
 
     @Test
     @DisplayName("Testing that a User entity can be deleted by ID")
@@ -193,23 +208,20 @@ class UserControllerTest {
         System.out.println("User deleted with ID: " + userId);
     }
 
-    //ToDo: Finish handle bad delete response and then implement this test
-    @Disabled
     @Test
     @DisplayName("Testing that a User entity can give a INTERNAL_SERVER_ERROR while deleting a USER")
     void testDeleteUserByIdError() {
-        Long userId = 1L;
+        // GIVEN
+        long userId = 9999L;
 
-        doNothing().when(userService).deleteUserById(userId);
+        // WHEN
+        doThrow(new NoSuchElementException("User not found"))
+                .when(userService).deleteUserById(userId);
 
-        ResponseEntity<?> responseEntity = userController.deleteUserById(userId);
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
-        assertNull(responseEntity.getBody());
-
-        verify(userService, times(1)).deleteUserById(userId);
-
-        System.out.println("User deletion failed as expected.");
+        // THEN
+        assertThrows(NoSuchElementException.class, () -> {
+            userController.deleteUserById(userId);
+        });
     }
 
     @Test
@@ -267,24 +279,20 @@ class UserControllerTest {
         System.out.println("User updated: " + updatedTestUser.getName());
     }
 
-    //ToDo: Finish assert response when negative delete is implemented
-    @Disabled
     @Test
-    @DisplayName("Testing that a User entity can give a INTERNAL_SERVER_ERROR while deleting a USER")
+    @DisplayName("Testing that a User entity can give an error while deleting a USER")
     void testUpdateUserByIdError() {
-        long userId = 1L;
-        UserRequest updatedUser = new UserRequest();
+        // GIVEN
+        long userId = 9999L;
 
-        when(userService.updateUserById(userId, updatedUser)).thenReturn(null);
+        // WHEN
+        doThrow(new NoSuchElementException("User not found"))
+                .when(userService).updateUserById(userId, userRequest);
 
-        ResponseEntity<?> responseEntity = userController.updateUserById(userId, updatedUser);
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
-        assertNull(responseEntity.getBody());
-
-        verify(userService, times(1)).updateUserById(userId, updatedUser);
-
-        System.out.println("User update failed as expected.");
+        // THEN
+        assertThrows(NoSuchElementException.class, () -> {
+            userController.updateUserById(userId, userRequest);
+        });
     }
 
     @Test
@@ -308,21 +316,21 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Testing that a User entity can give a INTERNAL_SERVER_ERROR while loading a list of USERS")
-    @Disabled
+    @DisplayName("Testing that a User entity can give an error while loading a list of USERS")
     void testLoadListOfUsersError() {
+        // GIVEN
         List<UserRequest> userRequestList = Arrays.asList(userRequest, userRequest, userRequest);
 
-        when(userService.loadListOfUsers(userRequestList)).thenReturn(null);
+        // WHEN
+        doThrow(new PaymentMethodNotFoundException("Payment method not valid"))
+                .when(userService).loadListOfUsers(userRequestList);
 
-        ResponseEntity<?> responseEntity = userController.loadListOfUsers(userRequestList);
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
-        assertNull(responseEntity.getBody());
+        // THEN
+        assertThrows(PaymentMethodNotFoundException.class, () -> {
+            userController.loadListOfUsers(userRequestList);
+        });
 
         verify(userService, times(1)).loadListOfUsers(userRequestList);
-
-        System.out.println("Loading users failed as expected.");
     }
 
     @Test
