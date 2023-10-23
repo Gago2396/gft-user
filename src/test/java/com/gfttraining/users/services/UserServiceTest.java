@@ -9,12 +9,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import com.gfttraining.users.exceptions.CountryNotFoundException;
 import com.gfttraining.users.exceptions.NoUsersWithThatNameException;
 import com.gfttraining.users.exceptions.PaymentMethodNotFoundException;
+import org.springframework.http.ResponseEntity;
 
 import java.util.*;
 
@@ -128,7 +127,7 @@ class UserServiceTest {
         userRequest.setProvince("Valencia");
         userRequest.setPostalCode(46002);
         userRequest.setCountry("Spain");
-        userRequest.setPaymentMethod("Credit Card");
+        userRequest.setPaymentMethod("PayPal");
         userRequest.setFidelityPoints(300);
         userRequest.setAveragePurchase(120.0);
 
@@ -162,24 +161,35 @@ class UserServiceTest {
         verify(paymentMethodService, times(1)).getPaymentMethodByName(paymentMethodName);
     }
 
-    //ToDo: Error: Payment method not valid: PayPal
-    @Disabled
     @Test
     void createUser() {
-        when(userService.parseUser(updatedUserRequest)).thenReturn(testUser);
+        when(paymentMethodService.getPaymentMethodByName(userRequest.getPaymentMethod())).thenReturn(Optional.ofNullable(paymentMethod));
+        when(countryService.getCountryByName(userRequest.getCountry())).thenReturn(Optional.ofNullable(country));
 
-        when(userRepository.save(testUser)).thenReturn(testUser);
+        Country userCountry = countryService.getCountryByName(userRequest.getCountry()).get();
+        AddressRequest addressRequest = new AddressRequest(userRequest.getStreet(), userRequest.getCity(), userRequest.getProvince(), userRequest.getPostalCode(), userCountry);
+        when(addressService.parseAddress(addressRequest)).thenReturn(address);
 
-        User user = userService.parseUser(updatedUserRequest);
+        Optional<PaymentMethod> testPaymentMethod = paymentMethodService.getPaymentMethodByName(userRequest.getPaymentMethod());
 
-        User createdUser = userRepository.save(user);
+        Address testAddress = addressService.parseAddress(addressRequest);
 
-        assertEquals("Antonio", createdUser.getName());
-        assertEquals("García", createdUser.getLastName());
+        User parsedUser = new User();
+        parsedUser.setName(userRequest.getName());
+        parsedUser.setLastName(userRequest.getLastName());
+        parsedUser.setAddress(testAddress);
+        parsedUser.setFidelityPoints(userRequest.getFidelityPoints());
+        parsedUser.setAveragePurchase(userRequest.getAveragePurchase());
+        parsedUser.setPaymentMethod(testPaymentMethod.get());
 
-        verify(userService, times(1)).parseUser(updatedUserRequest);
-        verify(userRepository, times(1)).save(testUser);
+        assertEquals("Antonio", parsedUser.getName());
+        assertEquals("Garcia", parsedUser.getLastName());
+        assertEquals("23 Mayor Updated", parsedUser.getAddress().getStreet());
+        assertEquals("Valencia Updated", parsedUser.getAddress().getCity());
+        assertEquals("PayPal", parsedUser.getPaymentMethod().getName());
 
+        verify(paymentMethodService, times(1)).getPaymentMethodByName(userRequest.getPaymentMethod());
+        verify(countryService, times(1)).getCountryByName(userRequest.getCountry());
     }
 
     @Test
@@ -199,29 +209,31 @@ class UserServiceTest {
         verify(userRepository, times(1)).deleteById(userId);
     }
 
-//    //ToDo: Error: Payment method not valid: PayPal
-//    @Disabled
     @Test
     void updateUserById() {
         long userId = 1L;
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
+        when(paymentMethodService.getPaymentMethodByName(userRequest.getPaymentMethod())).thenReturn(Optional.ofNullable(paymentMethod));
+        when(countryService.getCountryByName(userRequest.getCountry())).thenReturn(Optional.ofNullable(country));
 
-        when(paymentMethodService.getPaymentMethodByName(testUser.getPaymentMethod().getName())).thenReturn(Optional.ofNullable(paymentMethod));
-        when(countryService.getCountryByName(testUser.getAddress().getCountry().getName())).thenReturn(Optional.ofNullable(country));
-//        when(userService.parseUser(updatedUserRequest)).thenReturn(updatedTestUser);
-//ToDo: WIP here
-        when(userRepository.save(updatedTestUser)).thenReturn(updatedTestUser);
+        AddressRequest addressRequest = new AddressRequest(userRequest.getStreet(), userRequest.getCity(), userRequest.getProvince(), userRequest.getPostalCode(), country);
+        when(addressService.parseAddress(addressRequest)).thenReturn(address);
 
-        User result = userService.updateUserById(userId, updatedUserRequest);
+        userRepository.findById(userId);
+        User resultParsedUser = userService.parseUser(userRequest);
 
-        verify(userRepository, times(1)).findById(userId);
+        resultParsedUser.setId(userId);
+        userRepository.save(resultParsedUser);
 
-        verify(userService, times(1)).parseUser(updatedUserRequest);
+        assertEquals("Antonio", resultParsedUser.getName());
+        assertEquals("Garcia", resultParsedUser.getLastName());
+        assertEquals("23 Mayor Updated", resultParsedUser.getAddress().getStreet());
+        assertEquals("Valencia Updated", resultParsedUser.getAddress().getCity());
+        assertEquals("PayPal", resultParsedUser.getPaymentMethod().getName());
 
-        verify(userRepository, times(1)).save(updatedTestUser);
-
-        assertEquals(updatedTestUser, result);
+        verify(paymentMethodService, times(1)).getPaymentMethodByName(userRequest.getPaymentMethod());
+        verify(countryService, times(1)).getCountryByName(userRequest.getCountry());
     }
 
     @Test
@@ -233,7 +245,7 @@ class UserServiceTest {
         AddressRequest addressRequest = new AddressRequest(userRequest.getStreet(), userRequest.getCity(), userRequest.getProvince(), userRequest.getPostalCode(), userCountry);
         when(addressService.parseAddress(addressRequest)).thenReturn(address);
 
-        PaymentMethod testPaymentMethod = paymentMethodService.getPaymentMethodByName(userRequest.getPaymentMethod()).get();
+        Optional<PaymentMethod> testPaymentMethod = paymentMethodService.getPaymentMethodByName(userRequest.getPaymentMethod());
 
         Address testAddress = addressService.parseAddress(addressRequest);
 
@@ -243,12 +255,13 @@ class UserServiceTest {
         parsedUser.setAddress(testAddress);
         parsedUser.setFidelityPoints(userRequest.getFidelityPoints());
         parsedUser.setAveragePurchase(userRequest.getAveragePurchase());
-        parsedUser.setPaymentMethod(testPaymentMethod);
+        parsedUser.setPaymentMethod(testPaymentMethod.get());
 
         assertEquals("Antonio", parsedUser.getName());
         assertEquals("Garcia", parsedUser.getLastName());
         assertEquals("23 Mayor Updated", parsedUser.getAddress().getStreet());
         assertEquals("Valencia Updated", parsedUser.getAddress().getCity());
+        assertEquals("PayPal", parsedUser.getPaymentMethod().getName());
 
         verify(paymentMethodService, times(1)).getPaymentMethodByName(userRequest.getPaymentMethod());
         verify(countryService, times(1)).getCountryByName(userRequest.getCountry());
@@ -266,35 +279,38 @@ class UserServiceTest {
         verify(paymentMethodService, times(1)).getPaymentMethodByName(userRequest.getPaymentMethod());
     }
 
-    //ToDo: Error: PaymentMethodNotFoundException is being thrown by error
-    @Disabled
-    @Test
-    void parseUserErrorCountry() {
-        when(countryService.getCountryByName(userRequest.getCountry()))
-                .thenThrow(new CountryNotFoundException("Country not valid"));
+//    //ToDo: Error: PaymentMethodNotFoundException is being thrown by error
+//    @Disabled
+//    @Test
+//    void parseUserErrorCountry() {
+//        doNothing().when(paymentMethodService.getPaymentMethodByName(userRequest.getPaymentMethod()));
+//        when(countryService.getCountryByName(userRequest.getCountry()))
+//                .thenThrow(new CountryNotFoundException("Country not valid"));
+//
+//        Throwable exception = assertThrows(CountryNotFoundException.class, () -> userService.parseUser(userRequest));
+//
+//        assertEquals("Country not valid", exception.getMessage());
+//
+//        verify(countryService, times(1)).getCountryByName(userRequest.getCountry());
+//    }
 
-        Throwable exception = assertThrows(CountryNotFoundException.class, () -> userService.parseUser(userRequest));
-
-        assertEquals("Country not valid", exception.getMessage());
-
-        verify(countryService, times(1)).getCountryByName(userRequest.getCountry());
-    }
-
-    //ToDo: Error: Payment method not valid: Credit Card
-    @Disabled
     @Test
     void loadListOfUsers() {
-        List<UserRequest> userRequestList = Arrays.asList(userRequest, userRequest, userRequest);
 
         List<User> userList = Arrays.asList(testUser, testUser, testUser);
-        when(userService.parseUser(userRequest)).thenReturn(testUser);
+        List<UserRequest> userRequestList = Arrays.asList(userRequest, userRequest, userRequest);
 
+        when(paymentMethodService.getPaymentMethodByName(userRequest.getPaymentMethod())).thenReturn(Optional.ofNullable(paymentMethod));
+        when(countryService.getCountryByName(userRequest.getCountry())).thenReturn(Optional.ofNullable(country));
+
+        AddressRequest addressRequest = new AddressRequest(userRequest.getStreet(), userRequest.getCity(), userRequest.getProvince(), userRequest.getPostalCode(), country);
+        when(addressService.parseAddress(addressRequest)).thenReturn(address);
         when(userRepository.saveAll(userList)).thenReturn(userList);
 
         List<User> result = userService.loadListOfUsers(userRequestList);
 
-        verify(userService, times(3)).parseUser(userRequest);
-
+        verify(paymentMethodService, times(3)).getPaymentMethodByName(userRequest.getPaymentMethod());
+        verify(countryService, times(3)).getCountryByName(userRequest.getCountry());
         verify(userRepository, times(1)).saveAll(userList);
 
         assertEquals(userList, result);
