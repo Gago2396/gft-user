@@ -38,7 +38,7 @@ public class UserController {
     }
 
     @PostMapping("/load")
-    public ResponseEntity<?> loadListOfUsers(@RequestBody @Valid List<UserRequest> userRequestList) {
+    public ResponseEntity<?> loadListOfUsers(@RequestBody List<@Valid UserRequest> userRequestList) {
         return new ResponseEntity<>(userService.loadListOfUsers(userRequestList), HttpStatus.CREATED);
     }
 

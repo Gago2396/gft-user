@@ -1,5 +1,6 @@
 package com.gfttraining.users.controllers;
 
+import com.gfttraining.users.exceptions.CountryNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -38,5 +39,9 @@ public class UserControllerAdvice {
     public ResponseEntity<String> NoSuchElementException(NoSuchElementException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
-
+    
+    @ExceptionHandler(CountryNotFoundException.class)
+    public ResponseEntity<String> CountryNotFoundException(CountryNotFoundException ex){
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
 }
