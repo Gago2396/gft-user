@@ -1,102 +1,184 @@
 package com.gfttraining.users.controllers;
 
 import com.gfttraining.users.models.Favorite;
+import com.gfttraining.users.models.FavoriteDTO;
 import com.gfttraining.users.models.FavoriteRequest;
 import com.gfttraining.users.models.User;
 import com.gfttraining.users.services.FavoriteService;
 import com.gfttraining.users.services.UserService;
+import org.aspectj.lang.annotation.Before;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-// ToDo: finish this test when connection with microservice is finished
+
 @ExtendWith(MockitoExtension.class)
 class FavoriteControllerTest {
 
-//    @InjectMocks
-//    private FavoriteController favoriteController;
-//
-//    @Mock
-//    private FavoriteService favoriteService;
-//
-//    @Mock
-//    private UserService userService;
-//
-//    private FavoriteRequest testFavoriteRequest;
-//    private User testUser;
-//
-//    @BeforeEach
-//    void setUp() {
-//        // Mock User
-//        testUser = new User();
-//        testUser.setId(1L);
-//
-//        // FavoriteRequest
-//        testFavoriteRequest = new FavoriteRequest();
-//        testFavoriteRequest.setUser(1L);
-//        testFavoriteRequest.setProduct("SampleProduct");
-//    }
-//
-//    @Test
-//    @DisplayName("Add Favorite")
-//    void testAddFavorite() {
-//        when(userService.getUserById(testFavoriteRequest.getUser())).thenReturn(testUser);
-//        Favorite favorite = new Favorite(testUser, testFavoriteRequest.getProduct());
-//        when(favoriteService.addFavorite(favorite)).thenReturn(favorite);
-//
-//        ResponseEntity<?> responseEntity = favoriteController.addFavorite(testFavoriteRequest);
-//
-//        assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
-//        assertEquals(favorite, responseEntity.getBody());
-//        verify(userService, times(1)).getUserById(testFavoriteRequest.getUser());
-//        verify(favoriteService, times(1)).addFavorite(favorite);
-//    }
-//
-//    @Test
-//    @DisplayName("Delete Favorite")
-//    void testDeleteFavorite() {
-//        doNothing().when(favoriteService).deleteFavorite(testFavoriteRequest.getUser(), testFavoriteRequest.getProduct());
-//
-//        ResponseEntity<String> responseEntity = favoriteController.deleteFavorite(testFavoriteRequest);
-//
-//        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-//        assertEquals("Favorite deleted successfully", responseEntity.getBody());
-//        verify(favoriteService, times(1)).deleteFavorite(testFavoriteRequest.getUser(), testFavoriteRequest.getProduct());
-//    }
-//
-//    @Test
-//    @DisplayName("Search User Favorites")
-//    void testSearchUserFavorites() {
-//        long userId = 1L;
-//        when(favoriteService.searchUserFavorites(userId)).thenReturn(Arrays.asList(testFavoriteRequest.getProduct()));
-//
-//        ResponseEntity<?> responseEntity = favoriteController.searchUserFavorites(userId);
-//
-//        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-//        assertEquals(Arrays.asList(testFavoriteRequest.getProduct()), responseEntity.getBody());
-//        verify(favoriteService, times(1)).searchUserFavorites(userId);
-//    }
-//
-//    @Test
-//    @DisplayName("Delete Favorite by Product")
-//    void testDeleteFavoriteByProduct() {
-//        long productId = 1L;
-//        doNothing().when(favoriteService).deleteFavoriteByProduct(productId);
-//
-//        ResponseEntity<String> responseEntity = favoriteController.deleteFavoriteByProduct(productId);
-//
-//        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-//        assertEquals("Favorite deleted successfully", responseEntity.getBody());
-//        verify(favoriteService, times(1)).deleteFavoriteByProduct(productId);
-//    }
+    @Mock
+    private FavoriteService favoriteService;
+
+    @Mock
+    private UserService userService;
+
+    private FavoriteController favoriteController;
+
+    @BeforeEach
+    void setUp() {
+        favoriteController = new FavoriteController(favoriteService, userService);
+    }
+
+    @Test
+    @DisplayName("GIVEN a valid FavoriteRequest WHEN addFavorite method is called THEN return a the favorite and an OK")
+    public void testAddFavoriteSuccess() {
+        // GIVEN
+        FavoriteRequest favoriteRequest = new FavoriteRequest();
+        favoriteRequest.setUser(1L);
+        favoriteRequest.setProduct(1L);
+
+        User mockUser = new User();
+        when(userService.getUserById(favoriteRequest.getUser())).thenReturn(mockUser);
+
+        when(favoriteService.addFavorite(any(Favorite.class))).thenReturn(new Favorite());
+
+        // WHEN
+        ResponseEntity<?> response = favoriteController.addFavorite(favoriteRequest);
+
+        // THEN
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        verify(favoriteService, times(1)).addFavorite(any(Favorite.class));
+    }
+
+    @Test
+    @DisplayName("GIVEN a non-existent user WHEN addFavorite method is called THEN throw NoSuchElementException")
+    void testAddFavoriteInvalid() {
+        // GIVEN
+        FavoriteRequest requestWithNonExistentUser = new FavoriteRequest();
+        requestWithNonExistentUser.setUser(999L);
+
+        // WHEN
+        when(userService.getUserById(requestWithNonExistentUser.getUser()))
+                .thenThrow(new NoSuchElementException("User not found"));
+
+        // THEN
+        assertThrows(NoSuchElementException.class, () -> {
+            favoriteController.addFavorite(requestWithNonExistentUser);
+        });
+    }
+
+
+    @Test
+    @DisplayName("GIVEN a valid FavoriteRequest WHEN deleteFavorite method is called THEN return OK and delete the favorite")
+    public void testDeleteFavoriteSuccess() {
+        // GIVEN
+        FavoriteRequest favoriteRequest = new FavoriteRequest();
+        favoriteRequest.setUser(1L);
+        favoriteRequest.setProduct(1L);
+
+        User mockUser = new User();
+        when(userService.getUserById(favoriteRequest.getUser())).thenReturn(mockUser);
+
+        // WHEN
+        ResponseEntity<String> response = favoriteController.deleteFavorite(favoriteRequest);
+
+        // THEN
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        verify(favoriteService, times(1)).deleteFavorite(eq(1L), eq(1L));
+    }
+
+    @Test
+    @DisplayName("GIVEN a non-existent user WHEN deleteFavorite method is called THEN throw NoSuchElementException")
+    void testDeleteFavoriteInvalid() {
+        // GIVEN
+        FavoriteRequest requestWithNonExistentUser = new FavoriteRequest();
+        requestWithNonExistentUser.setUser(999L);
+
+        // WHEN
+        when(userService.getUserById(requestWithNonExistentUser.getUser()))
+                .thenThrow(new NoSuchElementException("User not found"));
+
+        // THEN
+        assertThrows(NoSuchElementException.class, () -> {
+            favoriteController.deleteFavorite(requestWithNonExistentUser);
+        });
+    }
+
+    @Test
+    @DisplayName("GIVEN a valid user ID WHEN searchUserFavorites method is called THEN return OK and a list of favorites")
+    public void testSearchUserFavoritesSuccess() {
+        // GIVEN
+        long userId = 1L;
+        User user = new User();
+
+        when(userService.getUserById(userId)).thenReturn(user);
+        when(favoriteService.searchUserFavorites(user)).thenReturn(new FavoriteDTO());
+
+        // WHEN
+        ResponseEntity<?> response = favoriteController.searchUserFavorites(userId);
+
+        // THEN
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isInstanceOf(FavoriteDTO.class);
+    }
+
+    @Test
+    @DisplayName("GIVEN a non-existent user WHEN searchUserFavorites method is called THEN throw NoSuchElementException")
+    void testSearchUserFavoritesInvalid() {
+        // GIVEN
+        long userId = 999L;
+
+        // WHEN
+        when(userService.getUserById(userId))
+                .thenThrow(new NoSuchElementException("User not found"));
+
+        // THEN
+        assertThrows(NoSuchElementException.class, () -> {
+            favoriteController.searchUserFavorites(userId);
+        });
+    }
+
+    @Test
+    @DisplayName("GIVEN a valid product ID WHEN deleteFavoriteByProduct method is called THEN return OK and delete the favorite by product")
+    public void testDeleteFavoriteByProductSuccess() {
+        // GIVEN
+        long productId = 1L;
+
+        // WHEN
+        ResponseEntity<String> response = favoriteController.deleteFavoriteByProduct(productId);
+
+        // THEN
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        verify(favoriteService, times(1)).deleteFavoriteByProduct(productId);
+    }
+
+    @Test
+    @DisplayName("GIVEN a non-existent user WHEN searchUserFavorites method is called THEN throw NoSuchElementException")
+    void testDeleteFavoriteByProductInvalid() {
+        // GIVEN
+        long userId = 999L;
+
+        // WHEN
+        when(userService.getUserById(userId))
+                .thenThrow(new NoSuchElementException("User not found"));
+
+        // THEN
+        assertThrows(NoSuchElementException.class, () -> {
+            favoriteController.deleteFavoriteByProduct(userId);
+        });
+    }
 }

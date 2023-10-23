@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.NoSuchElementException;
 
 @RestController
@@ -24,7 +25,7 @@ public class FavoriteController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> addFavorite(@RequestBody FavoriteRequest favoriteReq) {
+    public ResponseEntity<?> addFavorite(@RequestBody @Valid FavoriteRequest favoriteReq) {
 
         User user = userService.getUserById(favoriteReq.getUser());
         Favorite favorite = new Favorite(user, favoriteReq.getProduct());
@@ -33,14 +34,16 @@ public class FavoriteController {
     }
 
     @DeleteMapping()
-    public ResponseEntity<String> deleteFavorite(@RequestBody FavoriteRequest favoriteReq) {
+    public ResponseEntity<String> deleteFavorite(@RequestBody @Valid FavoriteRequest favoriteReq) {
+        userService.getUserById(favoriteReq.getUser());
         favoriteService.deleteFavorite(favoriteReq.getUser(), favoriteReq.getProduct());
         return new ResponseEntity<>("Favorite deleted successfully", HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> searchUserFavorites(@PathVariable long id) {
-        return new ResponseEntity<>(favoriteService.searchUserFavorites(id), HttpStatus.OK);
+        User user = userService.getUserById(id);
+        return new ResponseEntity<>(favoriteService.searchUserFavorites(user), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
