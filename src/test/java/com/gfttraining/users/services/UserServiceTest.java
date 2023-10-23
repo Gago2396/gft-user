@@ -16,10 +16,7 @@ import com.gfttraining.users.exceptions.CountryNotFoundException;
 import com.gfttraining.users.exceptions.NoUsersWithThatNameException;
 import com.gfttraining.users.exceptions.PaymentMethodNotFoundException;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -29,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
-    @InjectMocks
     private UserService userService;
 
     @Mock
@@ -73,6 +69,7 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
+        userService = new UserService(userRepository, countryService, addressService, paymentMethodService, favoriteRepository);
         userController = new UserController(userService);
 
         // PaymentMethod
@@ -202,16 +199,18 @@ class UserServiceTest {
         verify(userRepository, times(1)).deleteById(userId);
     }
 
-    //ToDo: Error: Payment method not valid: PayPal
-    @Disabled
+//    //ToDo: Error: Payment method not valid: PayPal
+//    @Disabled
     @Test
     void updateUserById() {
         long userId = 1L;
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
 
-        when(userService.parseUser(updatedUserRequest)).thenReturn(updatedTestUser);
-
+        when(paymentMethodService.getPaymentMethodByName(testUser.getPaymentMethod().getName())).thenReturn(Optional.ofNullable(paymentMethod));
+        when(countryService.getCountryByName(testUser.getAddress().getCountry().getName())).thenReturn(Optional.ofNullable(country));
+//        when(userService.parseUser(updatedUserRequest)).thenReturn(updatedTestUser);
+//ToDo: WIP here
         when(userRepository.save(updatedTestUser)).thenReturn(updatedTestUser);
 
         User result = userService.updateUserById(userId, updatedUserRequest);
@@ -308,8 +307,9 @@ class UserServiceTest {
 
         when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(testUser));
 
-        assertEquals("Antonio", testUser.getName());
-        assertEquals("Garcia", testUser.getLastName());
+        Optional<User> testIdUser = userRepository.findById(userId);
+        assertEquals("Antonio", testIdUser.get().getName());
+        assertEquals("Garcia", testIdUser.get().getLastName());
 
         verify(userRepository, times(1)).findById(userId);
     }
@@ -330,9 +330,35 @@ class UserServiceTest {
 
     @Test
     void getUserByName() {
+        String name = "Antonio";
+
+        List<User> userList = Arrays.asList(testUser, testUser, testUser);
+        when(userRepository.findByName(name)).thenReturn((Optional.of(userList)));
+
+        Optional<List<User>> testList = userRepository.findByName(name);
+
+        User firstUser = testList.orElse(Collections.emptyList()).stream().findFirst().orElse(null);
+
+        assertEquals("Antonio", firstUser.getName());
+        assertEquals("Garcia", firstUser.getLastName());
+        assertEquals("Valencia Updated", firstUser.getAddress().getCity());
+        assertEquals(3, userList.size());
+
+        verify(userRepository, times(1)).findByName(name);
     }
 
     @Test
-    void getListOfUsers() {
+    void getUserByNameError() {
+        String name = "NonExistentName";
+
+        when(userRepository.findByName(name))
+                .thenThrow(new NoUsersWithThatNameException("User not found"));
+
+        Throwable exception = assertThrows(NoUsersWithThatNameException.class, () -> userRepository.findByName(name));
+
+        assertEquals("User not found", exception.getMessage());
+
+        verify(userRepository, times(1)).findByName(name);
+
     }
 }
