@@ -91,7 +91,6 @@ public class UserService {
     }
 
     public List<User> getUserByName(String name) {
-     //ToDo: Refactor
         return userRepository.findByName(name)
                 .orElse(Collections.emptyList());
     }
