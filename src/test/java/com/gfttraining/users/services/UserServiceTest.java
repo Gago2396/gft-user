@@ -375,7 +375,6 @@ class UserServiceTest {
 
         Throwable exception = assertThrows(NoUsersWithThatNameException.class, () -> userService.getUserByName(name));
 
-
         assertEquals("User not found", exception.getMessage());
 
         verify(userRepository, times(1)).findByName(name);
