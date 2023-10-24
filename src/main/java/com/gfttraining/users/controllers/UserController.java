@@ -14,32 +14,32 @@ import java.util.NoSuchElementException;
 @RestController
 @RequestMapping("/users")
 public class UserController {
-
     private final UserService userService;
 
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
+    /*
+========= ORDER =========
+1.- Create User.
+2.- Get All Users
+3.- Get User By ID
+4.- Get User By Name
+5.- Load List of Users
+6.- Update User By ID
+7.- Delete User By ID
+=========================
+*/
+
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody @Valid UserRequest userRequest) {
         return new ResponseEntity<>(userService.createUser(userRequest), HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateUserById(@PathVariable long id, @RequestBody @Valid UserRequest updatedUserRequest) {
-        return new ResponseEntity<>(userService.updateUserById(id, updatedUserRequest), HttpStatus.OK);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUserById(@PathVariable long id) {
-        userService.deleteUserById(id);
-        return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
-    }
-
-    @PostMapping("/load")
-    public ResponseEntity<?> loadListOfUsers(@RequestBody List<@Valid UserRequest> userRequestList) {
-        return new ResponseEntity<>(userService.loadListOfUsers(userRequestList), HttpStatus.CREATED);
+    @GetMapping("/list")
+    public ResponseEntity<?> getListOfUsers() {
+        return new ResponseEntity<>(userService.getListOfUsers(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -52,9 +52,20 @@ public class UserController {
         return new ResponseEntity<>(userService.getUserByName(name), HttpStatus.OK);
     }
 
-    @GetMapping("/list")
-    public ResponseEntity<?> getListOfUsers() {
-        return new ResponseEntity<>(userService.getListOfUsers(), HttpStatus.OK);
+    @PostMapping("/load")
+    public ResponseEntity<?> loadListOfUsers(@RequestBody List<@Valid UserRequest> userRequestList) {
+        return new ResponseEntity<>(userService.loadListOfUsers(userRequestList), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateUserById(@PathVariable long id, @RequestBody @Valid UserRequest updatedUserRequest) {
+        return new ResponseEntity<>(userService.updateUserById(id, updatedUserRequest), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUserById(@PathVariable long id) {
+        userService.deleteUserById(id);
+        return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
     }
 }
 
