@@ -1,6 +1,7 @@
 package com.gfttraining.users.services;
 
 import com.gfttraining.users.controllers.UserController;
+import com.gfttraining.users.exceptions.CountryNotFoundException;
 import com.gfttraining.users.models.*;
 import com.gfttraining.users.repositories.FavoriteRepository;
 import com.gfttraining.users.repositories.PaymentMethodRepository;
@@ -146,22 +147,6 @@ class UserServiceTest {
     }
 
     @Test
-    void findPaymentMethod() {
-        String paymentMethodName = paymentMethod.getName();
-
-        when(paymentMethodService.getPaymentMethodByName(paymentMethodName)).thenReturn(Optional.ofNullable(paymentMethod));
-
-        Optional<PaymentMethod> result = paymentMethodService.getPaymentMethodByName(paymentMethodName);
-
-        assertThat(result.get().getName(), equalTo("PayPal"));
-        assertThat(result.get().getId(), equalTo(1L));
-
-        assertThat(result.get(), equalTo(paymentMethod));
-
-        verify(paymentMethodService, times(1)).getPaymentMethodByName(paymentMethodName);
-    }
-
-    @Test
     void createUser() {
         when(paymentMethodService.getPaymentMethodByName(userRequest.getPaymentMethod())).thenReturn(Optional.ofNullable(paymentMethod));
         when(countryService.getCountryByName(userRequest.getCountry())).thenReturn(Optional.ofNullable(country));
@@ -207,6 +192,17 @@ class UserServiceTest {
         verify(favoriteRepository, times(1)).deleteByUser(testUser);
 
         verify(userRepository, times(1)).deleteById(userId);
+    }
+
+    @Test
+    void deleteUserByIdError() {
+        Long userId = 1234L;
+
+        Throwable exception = assertThrows(NoSuchElementException.class, () -> userService.deleteUserById(userId));
+
+        assertEquals("User not found", exception.getMessage());
+
+        verify(userRepository, times(1)).findById(userId);
     }
 
     @Test
@@ -269,30 +265,25 @@ class UserServiceTest {
 
     @Test
     void parseUserErrorPaymentMethod() {
-        when(paymentMethodService.getPaymentMethodByName(userRequest.getPaymentMethod()))
-                .thenThrow(new PaymentMethodNotFoundException("Payment method not valid"));
-
         Throwable exception = assertThrows(PaymentMethodNotFoundException.class, () -> userService.parseUser(userRequest));
 
         assertEquals("Payment method not valid", exception.getMessage());
 
         verify(paymentMethodService, times(1)).getPaymentMethodByName(userRequest.getPaymentMethod());
+        verify(countryService, times(0)).getCountryByName(userRequest.getCountry());
     }
 
-//    //ToDo: Error: PaymentMethodNotFoundException is being thrown by error
-//    @Disabled
-//    @Test
-//    void parseUserErrorCountry() {
-//        doNothing().when(paymentMethodService.getPaymentMethodByName(userRequest.getPaymentMethod()));
-//        when(countryService.getCountryByName(userRequest.getCountry()))
-//                .thenThrow(new CountryNotFoundException("Country not valid"));
-//
-//        Throwable exception = assertThrows(CountryNotFoundException.class, () -> userService.parseUser(userRequest));
-//
-//        assertEquals("Country not valid", exception.getMessage());
-//
-//        verify(countryService, times(1)).getCountryByName(userRequest.getCountry());
-//    }
+    @Test
+    void parseUserErrorCountry() {
+        when(paymentMethodService.getPaymentMethodByName(userRequest.getPaymentMethod())).thenReturn(Optional.ofNullable(paymentMethod));
+
+        Throwable exception = assertThrows(CountryNotFoundException.class, () -> userService.parseUser(userRequest));
+
+        assertEquals("Country not found", exception.getMessage());
+
+        verify(paymentMethodService, times(1)).getPaymentMethodByName(userRequest.getPaymentMethod());
+        verify(countryService, times(1)).getCountryByName(userRequest.getCountry());
+    }
 
     @Test
     void loadListOfUsers() {
@@ -349,11 +340,11 @@ class UserServiceTest {
         String name = "Antonio";
 
         List<User> userList = Arrays.asList(testUser, testUser, testUser);
-        when(userRepository.findByName(name)).thenReturn((Optional.of(userList)));
+        when(userRepository.findByName(name)).thenReturn(Optional.of(userList));
 
-        Optional<List<User>> testList = userRepository.findByName(name);
+        List<User> result = userService.getUserByName(name);
 
-        User firstUser = testList.orElse(Collections.emptyList()).stream().findFirst().orElse(null);
+        User firstUser = result.stream().findFirst().orElse(null);
 
         assertEquals("Antonio", firstUser.getName());
         assertEquals("Garcia", firstUser.getLastName());
@@ -370,11 +361,13 @@ class UserServiceTest {
         when(userRepository.findByName(name))
                 .thenThrow(new NoUsersWithThatNameException("User not found"));
 
-        Throwable exception = assertThrows(NoUsersWithThatNameException.class, () -> userRepository.findByName(name));
+        Throwable exception = assertThrows(NoUsersWithThatNameException.class, () -> userService.getUserByName(name));
+
 
         assertEquals("User not found", exception.getMessage());
 
         verify(userRepository, times(1)).findByName(name);
 
     }
+
 }

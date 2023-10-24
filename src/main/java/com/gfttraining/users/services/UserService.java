@@ -1,17 +1,13 @@
 package com.gfttraining.users.services;
 
 import com.gfttraining.users.exceptions.CountryNotFoundException;
-import com.gfttraining.users.exceptions.NoUsersWithThatNameException;
 import com.gfttraining.users.exceptions.PaymentMethodNotFoundException;
 import com.gfttraining.users.models.*;
 import com.gfttraining.users.repositories.FavoriteRepository;
 import com.gfttraining.users.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -30,19 +26,14 @@ public class UserService {
         this.favoriteRepository = favoriteRepository;
     }
 
-    public PaymentMethod findPaymentMethod(String paymentMethodName) {
-        return paymentMethodService
-                .getPaymentMethodByName(paymentMethodName)
-                .orElseThrow(() -> new NoSuchElementException("PaymentMethod not found"));
-    }
-
     public User createUser(UserRequest userRequest) {
         User user = parseUser(userRequest);
         return userRepository.save(user);
     }
 
     public void deleteUserById(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("User not found"));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("User not found"));
         favoriteRepository.deleteByUser(user);
         userRepository.deleteById(id);
     }
@@ -100,9 +91,8 @@ public class UserService {
     }
 
     public List<User> getUserByName(String name) {
-     //ToDo: Refactor
         return userRepository.findByName(name)
-                .orElseThrow(() -> new NoUsersWithThatNameException("User not found"));
+                .orElse(Collections.emptyList());
     }
 
     public List<User> getListOfUsers() {
