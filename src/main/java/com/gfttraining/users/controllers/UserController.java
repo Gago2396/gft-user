@@ -14,23 +14,12 @@ import java.util.NoSuchElementException;
 @RestController
 @RequestMapping("/users")
 public class UserController {
+
     private final UserService userService;
 
     public UserController(UserService userService) {
         this.userService = userService;
     }
-
-    /*
-========= ORDER =========
-1.- Create User.
-2.- Get All Users
-3.- Get User By ID
-4.- Get User By Name
-5.- Load List of Users
-6.- Update User By ID
-7.- Delete User By ID
-=========================
-*/
 
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody @Valid UserRequest userRequest) {
