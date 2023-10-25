@@ -1,13 +1,12 @@
 package com.gfttraining.users.controllers;
 
+import com.gfttraining.users.exceptions.PaymentMethodNotFoundException;
 import com.gfttraining.users.models.*;
 import com.gfttraining.users.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -15,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -122,7 +121,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Testing that a User can be created")
+    @DisplayName("GIVEN a valid UserRequest WHEN createUser method is called THEN return an User and CREATED")
     void testCreateUser() {
         ResponseEntity<User> expectedResponse = new ResponseEntity<>(testUser, HttpStatus.CREATED);
         when(userService.createUser(userRequest)).thenReturn(expectedResponse.getBody());
@@ -137,25 +136,24 @@ class UserControllerTest {
         System.out.println("User created: " + testUser.getName());
     }
 
-    //ToDo: Finish assert response when negative create is implemented
-    @Disabled
     @Test
-    @DisplayName("Testing that a User entity can give a INTERNAL_SERVER_ERROR while creating a USER")
+    @DisplayName("GIVEN a non-existent PaymentMethod WHEN createUser method is called THEN throw PaymentMethodNotFoundException")
     void testCreateUserError() {
-        when(userService.createUser(userRequest)).thenReturn(null);
+        // GIVEN
+        UserRequest userToCreate = userRequest;
 
-        ResponseEntity<?> responseEntity = userController.createUser(userRequest);
+        // WHEN
+        doThrow(new PaymentMethodNotFoundException("Payment method not valid"))
+                .when(userService).createUser(userRequest);
 
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
-        assertNull(responseEntity.getBody());
-
-        verify(userService, times(1)).createUser(userRequest);
-
-        System.out.println("User creation failed as expected.");
+        // THEN
+        assertThrows(PaymentMethodNotFoundException.class, () -> {
+            userController.createUser(userToCreate);
+        });
     }
 
     @Test
-    @DisplayName("Get User by id")
+    @DisplayName("GIVEN a valid User ID WHEN getUserById method is called THEN return OK and a User")
     void testGetUserById() {
         long userId = 1L;
 
@@ -171,10 +169,24 @@ class UserControllerTest {
         System.out.println("User found by ID: " + testUser.getId());
     }
 
-    //ToDo: negative testGetUserById
+    @Test
+    @DisplayName("GIVEN a valid User ID WHEN getUserById method is called THEN throw NoSuchElementException")
+    void testGetUserByIdError() {
+        // GIVEN
+        long userId = 9999L;
+
+        // WHEN
+        when(userService.getUserById(userId))
+                .thenThrow(new NoSuchElementException("User not found"));
+
+        // THEN
+        assertThrows(NoSuchElementException.class, () -> {
+            userController.getUserById(userId);
+        });
+    }
 
     @Test
-    @DisplayName("Testing that a User entity can be deleted by ID")
+    @DisplayName("GIVEN a valid User WHEN deleteUserById method is called THEN delete the User")
     void testDeleteUserById() {
         Long userId = 1L;
 
@@ -193,27 +205,24 @@ class UserControllerTest {
         System.out.println("User deleted with ID: " + userId);
     }
 
-    //ToDo: Finish handle bad delete response and then implement this test
-    @Disabled
     @Test
-    @DisplayName("Testing that a User entity can give a INTERNAL_SERVER_ERROR while deleting a USER")
+    @DisplayName("GIVEN a non-existent user WHEN deleteUserById method is called THEN throw NoSuchElementException")
     void testDeleteUserByIdError() {
-        Long userId = 1L;
+        // GIVEN
+        long userId = 9999L;
 
-        doNothing().when(userService).deleteUserById(userId);
+        // WHEN
+        doThrow(new NoSuchElementException("User not found"))
+                .when(userService).deleteUserById(userId);
 
-        ResponseEntity<?> responseEntity = userController.deleteUserById(userId);
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
-        assertNull(responseEntity.getBody());
-
-        verify(userService, times(1)).deleteUserById(userId);
-
-        System.out.println("User deletion failed as expected.");
+        // THEN
+        assertThrows(NoSuchElementException.class, () -> {
+            userController.deleteUserById(userId);
+        });
     }
 
     @Test
-    @DisplayName("Get User by name")
+    @DisplayName("GIVEN a valid User name WHEN getUserByName method is called THEN return OK and a User")
     void testGetUserByName() {
         String userName = "Antonio";
 
@@ -230,8 +239,8 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Test search by name empty")
-    void testGetUserByNameError() {
+    @DisplayName("GIVEN an invalid User name WHEN getUserByName method is called THEN return empty list")
+    void testGetUserByNameNotFound() {
         String userName = "ErrorUser";
 
         when(userService.getUserByName(userName)).thenReturn(Arrays.asList());
@@ -242,12 +251,10 @@ class UserControllerTest {
         assertEquals(Arrays.asList(), responseEntity.getBody());
 
         verify(userService, times(1)).getUserByName(userName);
-
-        System.out.println("User not found so empty list was returned");
     }
 
     @Test
-    @DisplayName("Update User by id")
+    @DisplayName("GIVEN a User ID and a updated User WHEN updateUserById method is called THEN return OK and a updated User")
     void testUpdateUserById() {
 
         long userId = 1L;
@@ -267,28 +274,24 @@ class UserControllerTest {
         System.out.println("User updated: " + updatedTestUser.getName());
     }
 
-    //ToDo: Finish assert response when negative delete is implemented
-    @Disabled
     @Test
-    @DisplayName("Testing that a User entity can give a INTERNAL_SERVER_ERROR while deleting a USER")
+    @DisplayName("GIVEN an invalid User ID and a updated User WHEN updateUserById method is called THEN return NoSuchElementException")
     void testUpdateUserByIdError() {
-        long userId = 1L;
-        UserRequest updatedUser = new UserRequest();
+        // GIVEN
+        long userId = 9999L;
 
-        when(userService.updateUserById(userId, updatedUser)).thenReturn(null);
+        // WHEN
+        doThrow(new NoSuchElementException("User not found"))
+                .when(userService).updateUserById(userId, userRequest);
 
-        ResponseEntity<?> responseEntity = userController.updateUserById(userId, updatedUser);
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
-        assertNull(responseEntity.getBody());
-
-        verify(userService, times(1)).updateUserById(userId, updatedUser);
-
-        System.out.println("User update failed as expected.");
+        // THEN
+        assertThrows(NoSuchElementException.class, () -> {
+            userController.updateUserById(userId, userRequest);
+        });
     }
 
     @Test
-    @DisplayName("Testing to load a list of Users")
+    @DisplayName("GIVEN a list of UserRequest WHEN loadListOfUsers method is called THEN save the list and return OK")
     void testLoadListOfUsers() {
         List<UserRequest> userRequestList = Arrays.asList(userRequest, userRequest, userRequest);
 
@@ -308,25 +311,25 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Testing that a User entity can give a INTERNAL_SERVER_ERROR while loading a list of USERS")
-    @Disabled
+    @DisplayName("GIVEN a list of UserRequest with invalid paymentMethod WHEN loadListOfUsers method is called THEN return PaymentMethodNotFoundException")
     void testLoadListOfUsersError() {
+        // GIVEN
         List<UserRequest> userRequestList = Arrays.asList(userRequest, userRequest, userRequest);
 
-        when(userService.loadListOfUsers(userRequestList)).thenReturn(null);
+        // WHEN
+        doThrow(new PaymentMethodNotFoundException("Payment method not valid"))
+                .when(userService).loadListOfUsers(userRequestList);
 
-        ResponseEntity<?> responseEntity = userController.loadListOfUsers(userRequestList);
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
-        assertNull(responseEntity.getBody());
+        // THEN
+        assertThrows(PaymentMethodNotFoundException.class, () -> {
+            userController.loadListOfUsers(userRequestList);
+        });
 
         verify(userService, times(1)).loadListOfUsers(userRequestList);
-
-        System.out.println("Loading users failed as expected.");
     }
 
     @Test
-    @DisplayName("Get list of users")
+    @DisplayName("GIVEN and endpoint to send all users as a list WHEN getListOfUsers method is called THEN return a list of all the users")
     void testGetListOfUsers() {
         when(userService.getListOfUsers()).thenReturn(Arrays.asList(testUser, testUser, testUser));
 

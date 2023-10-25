@@ -6,18 +6,16 @@ import com.gfttraining.users.models.FavoriteRequest;
 import com.gfttraining.users.models.User;
 import com.gfttraining.users.services.FavoriteService;
 import com.gfttraining.users.services.UserService;
-import org.aspectj.lang.annotation.Before;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -41,7 +39,7 @@ class FavoriteControllerTest {
     }
 
     @Test
-    @DisplayName("GIVEN a valid FavoriteRequest WHEN addFavorite method is called THEN return a the favorite and an OK")
+    @DisplayName("GIVEN a valid FavoriteRequest WHEN addFavorite method is called THEN return a Favorite and CREATED")
     public void testAddFavoriteSuccess() {
         // GIVEN
         FavoriteRequest favoriteRequest = new FavoriteRequest();
@@ -163,6 +161,7 @@ class FavoriteControllerTest {
         verify(favoriteService, times(1)).deleteFavoriteByProduct(productId);
     }
 
+    // ToDo: Test NOT_FOUND response when microservices are connected
     @Disabled
     @Test
     @DisplayName("GIVEN a non-existent user WHEN searchUserFavorites method is called THEN throw NoSuchElementException")

@@ -43,10 +43,12 @@ public class FavoriteControllerIT {
     ========= ORDER =========
     1.- Create Favorite.
     2.- Create Favorite. - USER Null
-    3.- Create Favorite. - USER Not found
+    3.- Create Favorite. - USER Not Found
     4.- Get Favorite By ID
     5.- Delete Favorite By ID
-    6.- Get Favorite By ID - Not found
+    6.- Delete Favorite By ID - USER Not Found
+    7.- Get Favorite By ID - FAVORITE Not Found
+    8.- Get Favorite By ID - USER Not Found
     =========================
 */
     @Test
@@ -154,9 +156,24 @@ public class FavoriteControllerIT {
     }
 
     @Test
+    @DisplayName("GIVEN a favoriteRequest with not existing User WHEN a delete is made to /users/favorites THEN it return 404 Not Found")
+    @Order(5)
+    void deleteFavoriteTestInvalid() {
+        FavoriteRequest favoriteRequest = new FavoriteRequest(1234L, 3L);
+
+        client.method(HttpMethod.DELETE).uri("/users/favorites/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(favoriteRequest)
+                .exchange()
+
+                .expectStatus().isNotFound()
+                .expectBody().jsonPath("$").isEqualTo("User not found");
+    }
+
+    @Test
     @DisplayName("GIVEN a userId WHEN a get is made to /users/favorites THEN it should return 200 and FavoriteDTO")
-    @Order(6)
-    void getFavoriteByIdTestInvalid() {
+    @Order(7)
+    void getFavoriteByIdTestNotFound() {
         client.get().uri("/users/favorites/1")
                 .exchange()
 
@@ -177,5 +194,16 @@ public class FavoriteControllerIT {
                 .jsonPath("$.user.fidelityPoints").isEqualTo(100)
                 .jsonPath("$.user.averagePurchase").isEqualTo(75.50)
                 .jsonPath("$.favorites").isEmpty();
+    }
+
+    @Test
+    @DisplayName("GIVEN a non existing User WHEN a get is made to /users/favorites/1234 THEN it should return Not Found")
+    @Order(8)
+    void getFavoriteByIdTestInvalid() {
+        client.get().uri("/users/favorites/1234")
+                .exchange()
+
+                .expectStatus().isNotFound()
+                .expectBody().jsonPath("$").isEqualTo("User not found");
     }
 }
