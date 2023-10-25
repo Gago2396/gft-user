@@ -1,17 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FavoriteService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">java in users Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.gfttraining.users.services</a> &gt; <span class="el_source">FavoriteService.java</span></div><h1>FavoriteService.java</h1><pre class="source lang-java linenums">package com.gfttraining.users.services;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FavoriteService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">java in users Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.gfttraining.users.services</a> &gt; <span class="el_source">FavoriteService.java</span></div><h1>FavoriteService.java</h1><pre class="source lang-java linenums">package com.gfttraining.users.services;
 
 import com.gfttraining.users.models.Favorite;
 import com.gfttraining.users.models.FavoritePK;
-import com.gfttraining.users.models.FavoriteResponse;
+import com.gfttraining.users.models.FavoriteDTO;
 import com.gfttraining.users.models.User;
 import com.gfttraining.users.repositories.FavoriteRepository;
 import com.gfttraining.users.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,36 +19,33 @@ public class FavoriteService {
 
     private final UserRepository userRepository;
 
-<span class="fc" id="L24">    public FavoriteService(FavoriteRepository favoriteRepository, UserRepository userRepository) {</span>
-<span class="fc" id="L25">        this.favoriteRepository = favoriteRepository;</span>
-<span class="fc" id="L26">        this.userRepository = userRepository;</span>
-<span class="fc" id="L27">    }</span>
+<span class="fc" id="L22">    public FavoriteService(FavoriteRepository favoriteRepository, UserRepository userRepository) {</span>
+<span class="fc" id="L23">        this.favoriteRepository = favoriteRepository;</span>
+<span class="fc" id="L24">        this.userRepository = userRepository;</span>
+<span class="fc" id="L25">    }</span>
 
     public Favorite addFavorite(Favorite favorite) {
-<span class="nc" id="L30">        return favoriteRepository.save(favorite);</span>
+<span class="fc" id="L28">        return favoriteRepository.save(favorite);</span>
     }
 
     public void deleteFavorite(Long user, Long product) {
-<span class="nc" id="L34">        FavoritePK id = new FavoritePK(user, product);</span>
-<span class="nc" id="L35">        favoriteRepository.deleteById(id);</span>
-<span class="nc" id="L36">    }</span>
+<span class="fc" id="L32">        FavoritePK id = new FavoritePK(user, product);</span>
+<span class="fc" id="L33">        favoriteRepository.deleteById(id);</span>
+<span class="fc" id="L34">    }</span>
 
-    public FavoriteResponse searchUserFavorites(Long id) {
-<span class="nc" id="L39">        User user = userRepository.findById(id)</span>
-<span class="nc" id="L40">                .orElseThrow(() -&gt; new NoSuchElementException(&quot;User not found&quot;));</span>
+    public FavoriteDTO searchUserFavorites(User user) {
+<span class="fc" id="L37">        List&lt;Favorite&gt; favList = favoriteRepository.findByUser(user);</span>
 
-<span class="nc" id="L42">        List&lt;Favorite&gt; favList = favoriteRepository.findByUser(user)</span>
-<span class="nc" id="L43">                .orElseThrow(() -&gt; new NoSuchElementException(&quot;Favorites not found&quot;));</span>
+<span class="fc" id="L39">        List&lt;Long&gt; productIds = favList.stream()</span>
+<span class="fc" id="L40">                .map(Favorite::getProduct)</span>
+<span class="fc" id="L41">                .collect(Collectors.toList());</span>
 
-<span class="nc" id="L45">        List&lt;Long&gt; productIds = favList.stream()</span>
-<span class="nc" id="L46">                .map(Favorite::getProduct)</span>
-<span class="nc" id="L47">                .collect(Collectors.toList());</span>
-
-<span class="nc" id="L49">        return new FavoriteResponse(user, productIds);</span>
+<span class="fc" id="L43">        return new FavoriteDTO(user, productIds);</span>
     }
 
     public void deleteFavoriteByProduct(Long productId) {
-<span class="nc" id="L53">        favoriteRepository.deleteByProduct(productId);</span>
-<span class="nc" id="L54">    }</span>
+//        ToDo: Add NOT_FOUND response when microservices are connected
+<span class="fc" id="L48">        favoriteRepository.deleteByProduct(productId);</span>
+<span class="fc" id="L49">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

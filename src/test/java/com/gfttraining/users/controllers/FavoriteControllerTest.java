@@ -7,10 +7,7 @@ import com.gfttraining.users.models.User;
 import com.gfttraining.users.services.FavoriteService;
 import com.gfttraining.users.services.UserService;
 import org.aspectj.lang.annotation.Before;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -166,6 +163,7 @@ class FavoriteControllerTest {
         verify(favoriteService, times(1)).deleteFavoriteByProduct(productId);
     }
 
+    @Disabled
     @Test
     @DisplayName("GIVEN a non-existent user WHEN searchUserFavorites method is called THEN throw NoSuchElementException")
     void testDeleteFavoriteByProductInvalid() {

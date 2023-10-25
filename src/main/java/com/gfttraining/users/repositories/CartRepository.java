@@ -1,58 +1,59 @@
 package com.gfttraining.users.repositories;
 
-
+import com.gfttraining.users.exceptions.CartConnectionRefusedException;
+import com.gfttraining.users.exceptions.CartResponseFailedException;
 import com.gfttraining.users.models.Cart;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
+@Data
 @Repository
+@AllArgsConstructor
+@NoArgsConstructor
 public class CartRepository {
-
-
-    private final RestTemplate restTemplate;
-    @Value("${cartMicroservice.url}")
-    public String externalServiceUrl;
+    private RestTemplate restTemplate;
 
     public CartRepository(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
-
     }
-//    @Retryable(retryFor = InvalidCartConnectionException.class, maxAttemptsExpression = "${retry.maxAttempts}",
-//            backoff = @Backoff(delayExpression = "${retry.maxDelay}"))
 
-    public List<Cart> getCartsById(Long id) throws InvalidCartConnectionException, InvalidCartResponseException {
-        System.out.println("Attempt");
+    @Value("${cartMicroservice.url}")
+    public String externalServiceUrl;
+
+    public List<Cart> getCartById(Long user) throws CartConnectionRefusedException, CartResponseFailedException {
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<Long> requestEntity = new HttpEntity<>(id, headers);
+        HttpEntity<Long> requestEntity = new HttpEntity<>(user, headers);
 
         try{
-            ResponseEntity<Void> responseEntity = restTemplate.exchange(
+            ResponseEntity<List<Cart>> responseEntity = restTemplate.exchange(
                     "http://"+ externalServiceUrl +":"+"8887"+"/carts/getCartsById/",
-                    HttpMethod.PUT,
+                    HttpMethod.GET,
                     requestEntity,
-                    Void.class
+                    new ParameterizedTypeReference<List<Cart>>() {}
             );
 
             if (responseEntity.getStatusCode() == HttpStatus.OK) {
                 return responseEntity.getBody();
             } else if(responseEntity.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR){
-                throw new InvalidCartConnectionException("Invalid connection with cart microservice");
+                throw new CartConnectionRefusedException("Invalid connection with cart microservice");
             } else{
-                throw new InvalidCartResponseException("Invalid cart response: Expected 200 Got: " + responseEntity.getStatusCode());
+                throw new CartResponseFailedException("Invalid cart response: Expected 200 Got: " + responseEntity.getStatusCode());
             }
 
         } catch (RestClientException ex){
-            throw new InvalidCartConnectionException("Invalid connection with cart microservice");
+            throw new CartConnectionRefusedException("Invalid connection with cart microservice");
         }
-
-
-
     }
-
 }
