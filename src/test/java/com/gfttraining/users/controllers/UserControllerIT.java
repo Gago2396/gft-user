@@ -98,7 +98,7 @@ public class UserControllerIT {
     @Order(2)
     void postCreateUserTestNull() {
         UserRequest userRequest = new UserRequest(
-                "John",
+                null,
                 "Lennon",
                 "123 Main St",
                 "Liverpool",
@@ -114,7 +114,7 @@ public class UserControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(userRequest)
                 .exchange()
-//                .expectStatus().isBadRequest()
+                .expectStatus().isBadRequest()
                 .expectBody()
                 .jsonPath("$").isEqualTo("Validation error(s):\n Name is required;");
     }
@@ -233,7 +233,7 @@ public class UserControllerIT {
                 .jsonPath("$[10].address.city").isEqualTo("Liverpool")
                 .jsonPath("$[10].address.province").isEqualTo("Merseyside")
                 .jsonPath("$[10].address.postalCode").isEqualTo(13456)
-                .jsonPath("$[10].address.country.name").isEqualTo("United Kingdom")
+                .jsonPath("$[10].address.country.name").isEqualTo("Portugal")
                 .jsonPath("$[10].paymentMethod.name").isEqualTo("PayPal")
                 .jsonPath("$[10].fidelityPoints").isEqualTo(170)
                 .jsonPath("$[10].averagePurchase").isEqualTo(75.0)
