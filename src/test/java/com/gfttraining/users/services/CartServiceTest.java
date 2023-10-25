@@ -79,4 +79,12 @@ class CartServiceTest {
         int actualPoints = CartService.calculatePoints(new BigDecimal(price));
         assertEquals(expectedPoints, actualPoints);
     }
+
+    @Test
+    @DisplayName("Test for sumFidelityPoints with filtering")
+    void testSumFidelityPointsWithFilter() {
+        List<BigDecimal> pricesList = Arrays.asList(new BigDecimal("10"), new BigDecimal("25"), new BigDecimal("35"));
+        int result = cartService.sumFidelityPoints(pricesList);
+        assertEquals(4, result);
+    }
 }

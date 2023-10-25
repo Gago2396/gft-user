@@ -238,6 +238,16 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("GIVEN a valid User ID WHEN deleteUserById method is called THEN delete a User")
+    void updateUserByIdError() {
+        long userId = 99999L;
+
+        Throwable exception = assertThrows(NoSuchElementException.class, () -> userService.updateUserById(userId, updatedUserRequest));
+
+        assertEquals("User not found", exception.getMessage());
+    }
+
+    @Test
     @DisplayName("GIVEN a valid UserRequest WHEN parseUser method is called THEN return a User")
     void parseUser() {
         when(paymentMethodService.getPaymentMethodByName(userRequest.getPaymentMethod())).thenReturn(Optional.ofNullable(paymentMethod));

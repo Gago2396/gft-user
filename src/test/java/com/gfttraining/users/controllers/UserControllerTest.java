@@ -39,9 +39,6 @@ class UserControllerTest {
 
     private Address updatedAddress;
 
-    UserControllerTest() {
-    }
-
     @BeforeEach
     void setUp() {
         userController = new UserController(userService);

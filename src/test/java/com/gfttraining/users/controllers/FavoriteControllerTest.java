@@ -160,22 +160,4 @@ class FavoriteControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         verify(favoriteService, times(1)).deleteFavoriteByProduct(productId);
     }
-
-    // ToDo: Test NOT_FOUND response when microservices are connected
-    @Disabled
-    @Test
-    @DisplayName("GIVEN a non-existent user WHEN searchUserFavorites method is called THEN throw NoSuchElementException")
-    void testDeleteFavoriteByProductInvalid() {
-        // GIVEN
-        long userId = 999L;
-
-        // WHEN
-        when(userService.getUserById(userId))
-                .thenThrow(new NoSuchElementException("User not found"));
-
-        // THEN
-        assertThrows(NoSuchElementException.class, () -> {
-            favoriteController.deleteFavoriteByProduct(userId);
-        });
-    }
 }
