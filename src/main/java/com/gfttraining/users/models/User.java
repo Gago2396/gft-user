@@ -18,11 +18,15 @@ public class User {
 
     private String name;
     private String lastName;
-    private String address;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "payment_method_id")
+    @ManyToOne
+    @JoinColumn
+    private Address address;
+
+    @ManyToOne
+    @JoinColumn
     private PaymentMethod paymentMethod;
+
     private Integer fidelityPoints;
     private Double averagePurchase;
 
