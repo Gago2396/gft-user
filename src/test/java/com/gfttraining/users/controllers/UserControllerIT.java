@@ -69,7 +69,7 @@ public class UserControllerIT {
                 "Liverpool",
                 "Merseyside",
                 13456,
-                "United Kingdom",
+                "Portugal",
                 "PayPal",
                 170,
                 75.0
@@ -133,7 +133,7 @@ public class UserControllerIT {
         address.put("postalCode", 13456);
 
         JSONObject country = new JSONObject();
-        country.put("name", "United Kingdom");
+        country.put("name", "Portugal");
 
         address.put("country", country);
 
@@ -255,7 +255,7 @@ public class UserControllerIT {
                 "Barcelona",
                 57362,
                 "Spain",
-                "Paypal",
+                "PayPal",
                 300,
                 85.0
         );
@@ -273,7 +273,7 @@ public class UserControllerIT {
                 .jsonPath("$.address.province").isEqualTo("Barcelona")
                 .jsonPath("$.address.postalCode").isEqualTo(57362)
                 .jsonPath("$.address.country.name").isEqualTo("Spain")
-                .jsonPath("$.paymentMethod.name").isEqualTo("Paypal")
+                .jsonPath("$.paymentMethod.name").isEqualTo("PayPal")
                 .jsonPath("$.fidelityPoints").isEqualTo(300)
                 .jsonPath("$.averagePurchase").isEqualTo(85.0);
     }
