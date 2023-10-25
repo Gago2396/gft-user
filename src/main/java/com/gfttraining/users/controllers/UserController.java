@@ -2,8 +2,6 @@ package com.gfttraining.users.controllers;
 
 import com.gfttraining.users.exceptions.PaymentMethodNotFoundException;
 import com.gfttraining.users.models.UserRequest;
-
-import com.gfttraining.users.exceptions.ErrorResponse;
 import com.gfttraining.users.models.User;
 
 import com.gfttraining.users.services.UserService;
@@ -30,20 +28,9 @@ public class UserController {
         return new ResponseEntity<>(userService.createUser(userRequest), HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateUserById(@PathVariable long id, @RequestBody @Valid UserRequest updatedUserRequest) {
-        return new ResponseEntity<>(userService.updateUserById(id, updatedUserRequest), HttpStatus.OK);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUserById(@PathVariable long id) {
-        userService.deleteUserById(id);
-        return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
-    }
-
-    @PostMapping("/load")
-    public ResponseEntity<?> loadListOfUsers(@RequestBody List<@Valid UserRequest> userRequestList) {
-        return new ResponseEntity<>(userService.loadListOfUsers(userRequestList), HttpStatus.CREATED);
+    @GetMapping("/list")
+    public ResponseEntity<?> getListOfUsers() {
+        return new ResponseEntity<>(userService.getListOfUsers(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -56,9 +43,20 @@ public class UserController {
         return new ResponseEntity<>(userService.getUserByName(name), HttpStatus.OK);
     }
 
-    @GetMapping("/list")
-    public ResponseEntity<?> getListOfUsers() {
-        return new ResponseEntity<>(userService.getListOfUsers(), HttpStatus.OK);
+    @PostMapping("/load")
+    public ResponseEntity<?> loadListOfUsers(@RequestBody List<@Valid UserRequest> userRequestList) {
+        return new ResponseEntity<>(userService.loadListOfUsers(userRequestList), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateUserById(@PathVariable long id, @RequestBody @Valid UserRequest updatedUserRequest) {
+        return new ResponseEntity<>(userService.updateUserById(id, updatedUserRequest), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUserById(@PathVariable long id) {
+        userService.deleteUserById(id);
+        return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
     }
 }
 
