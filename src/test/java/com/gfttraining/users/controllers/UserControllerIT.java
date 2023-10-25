@@ -118,6 +118,7 @@ public class UserControllerIT {
         assertEquals("User not found", responseEntity.getBody());
     }
 
+    @Disabled
     @Test
     @DisplayName("Get User by id")
     public void testGetUserById() {

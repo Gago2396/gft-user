@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">java in users Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.gfttraining.users.controllers</a> &gt; <span class="el_source">UserController.java</span></div><h1>UserController.java</h1><pre class="source lang-java linenums">package com.gfttraining.users.controllers;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">java in users Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.gfttraining.users.controllers</a> &gt; <span class="el_source">UserController.java</span></div><h1>UserController.java</h1><pre class="source lang-java linenums">package com.gfttraining.users.controllers;
 
 import com.gfttraining.users.exceptions.PaymentMethodNotFoundException;
 import com.gfttraining.users.models.UserRequest;
@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping(&quot;/users&quot;)
@@ -16,74 +17,45 @@ public class UserController {
 
     private final UserService userService;
 
-<span class="fc" id="L19">    public UserController(UserService userService) {</span>
-<span class="fc" id="L20">        this.userService = userService;</span>
-<span class="fc" id="L21">    }</span>
+<span class="fc" id="L20">    public UserController(UserService userService) {</span>
+<span class="fc" id="L21">        this.userService = userService;</span>
+<span class="fc" id="L22">    }</span>
 
     @PostMapping
     public ResponseEntity&lt;?&gt; createUser(@RequestBody @Valid UserRequest userRequest) {
-        try {
-<span class="fc" id="L26">            return new ResponseEntity&lt;&gt;(userService.createUser(userRequest), HttpStatus.CREATED);</span>
-<span class="nc" id="L27">        } catch (PaymentMethodNotFoundException e) {</span>
-<span class="nc" id="L28">            return new ResponseEntity&lt;&gt;(e.getMessage(), HttpStatus.NOT_FOUND);</span>
-<span class="nc" id="L29">        } catch (Exception e) {</span>
-<span class="nc" id="L30">            return new ResponseEntity&lt;&gt;(e, HttpStatus.INTERNAL_SERVER_ERROR);</span>
-        }
+<span class="fc" id="L26">        return new ResponseEntity&lt;&gt;(userService.createUser(userRequest), HttpStatus.CREATED);</span>
     }
 
     @PutMapping(&quot;/{id}&quot;)
     public ResponseEntity&lt;?&gt; updateUserById(@PathVariable long id, @RequestBody @Valid UserRequest updatedUserRequest) {
-        try {
-<span class="fc" id="L37">            return new ResponseEntity&lt;&gt;(userService.updateUserById(id, updatedUserRequest), HttpStatus.OK);</span>
-<span class="nc" id="L38">        } catch (Exception e) {</span>
-<span class="nc" id="L39">            return new ResponseEntity&lt;&gt;(&quot;User not found&quot;, HttpStatus.NOT_FOUND);</span>
-        }
+<span class="fc" id="L31">        return new ResponseEntity&lt;&gt;(userService.updateUserById(id, updatedUserRequest), HttpStatus.OK);</span>
     }
 
     @DeleteMapping(&quot;/{id}&quot;)
     public ResponseEntity&lt;?&gt; deleteUserById(@PathVariable long id) {
-        try {
-<span class="nc" id="L46">            userService.deleteUserById(id);</span>
-<span class="nc" id="L47">            return new ResponseEntity&lt;&gt;(&quot;User deleted succesfully&quot;, HttpStatus.OK);</span>
-<span class="nc" id="L48">        } catch (Exception e) {</span>
-<span class="nc" id="L49">            return new ResponseEntity&lt;&gt;(&quot;User not found&quot;, HttpStatus.NOT_FOUND);</span>
-        }
+<span class="fc" id="L36">        userService.deleteUserById(id);</span>
+<span class="fc" id="L37">        return new ResponseEntity&lt;&gt;(&quot;User deleted successfully&quot;, HttpStatus.OK);</span>
     }
 
     @PostMapping(&quot;/load&quot;)
-    public ResponseEntity&lt;?&gt; loadListOfUsers(@RequestBody @Valid List&lt;UserRequest&gt; userRequestList) {
-        try {
-<span class="fc" id="L56">            return new ResponseEntity&lt;&gt;(userService.loadListOfUsers(userRequestList), HttpStatus.CREATED);</span>
-<span class="nc" id="L57">        } catch (Exception e) {</span>
-<span class="nc" id="L58">            return new ResponseEntity&lt;&gt;(&quot;Ops! Seems like database is down. Try again later!&quot;, HttpStatus.INTERNAL_SERVER_ERROR);</span>
-        }
+    public ResponseEntity&lt;?&gt; loadListOfUsers(@RequestBody List&lt;@Valid UserRequest&gt; userRequestList) {
+<span class="fc" id="L42">        return new ResponseEntity&lt;&gt;(userService.loadListOfUsers(userRequestList), HttpStatus.CREATED);</span>
     }
 
     @GetMapping(&quot;/{id}&quot;)
     public ResponseEntity&lt;?&gt; getUserById(@PathVariable long id) {
-        try {
-<span class="fc" id="L65">            return new ResponseEntity&lt;&gt;(userService.getUserById(id), HttpStatus.OK);</span>
-<span class="nc" id="L66">        } catch (Exception e) {</span>
-<span class="nc" id="L67">            return new ResponseEntity&lt;&gt;(&quot;User not found&quot;, HttpStatus.NOT_FOUND);</span>
-        }
+<span class="fc" id="L47">        return new ResponseEntity&lt;&gt;(userService.getUserById(id), HttpStatus.OK);</span>
     }
 
     @GetMapping(&quot;/search/{name}&quot;)
     public ResponseEntity&lt;?&gt; getUserByName(@PathVariable String name) {
-        try {
-<span class="nc" id="L74">            return new ResponseEntity&lt;&gt;(userService.getUserByName(name), HttpStatus.OK);</span>
-<span class="nc" id="L75">        } catch (Exception e) {</span>
-<span class="nc" id="L76">            return new ResponseEntity&lt;&gt;(&quot;User not found&quot;, HttpStatus.NOT_FOUND);</span>
-        }
+<span class="fc" id="L52">        return new ResponseEntity&lt;&gt;(userService.getUserByName(name), HttpStatus.OK);</span>
     }
 
     @GetMapping(&quot;/list&quot;)
     public ResponseEntity&lt;?&gt; getListOfUsers() {
-        try {
-<span class="nc" id="L83">            return new ResponseEntity&lt;&gt;(userService.getListOfUsers(), HttpStatus.OK);</span>
-<span class="nc" id="L84">        } catch (Exception e) {</span>
-<span class="nc" id="L85">            return new ResponseEntity&lt;&gt;(&quot;Ops! Seems like database is down. Try again later!&quot;, HttpStatus.INTERNAL_SERVER_ERROR);</span>
-        }
+<span class="fc" id="L57">        return new ResponseEntity&lt;&gt;(userService.getListOfUsers(), HttpStatus.OK);</span>
     }
 }
+
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

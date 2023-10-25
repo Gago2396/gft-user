@@ -2,6 +2,9 @@ package com.gfttraining.users.controllers;
 
 import com.gfttraining.users.models.FavoriteRequest;
 import com.gfttraining.users.services.FavoriteService;
+import netscape.javascript.JSObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,6 +12,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import springfox.documentation.spring.web.json.Json;
 
 import javax.annotation.PostConstruct;
 
@@ -50,7 +54,7 @@ public class FavoriteControllerIT {
     @Test
     @DisplayName("GIVEN a valid favoriteRequest When a post is made to /users/favorites Then it should be saved in database and return the saved favorite")
     @Order(1)
-    void postCreateFavoriteTest() {
+    void postCreateFavoriteTest() throws JSONException {
         FavoriteRequest favoriteRequest = new FavoriteRequest(1L, 3L);
 
         client.post().uri("/users/favorites")
