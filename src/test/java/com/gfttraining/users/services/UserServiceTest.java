@@ -8,6 +8,7 @@ import com.gfttraining.users.repositories.PaymentMethodRepository;
 import com.gfttraining.users.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -147,6 +148,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("GIVEN a valid UserRequest WHEN save method is called THEN save an User and return an User and CREATED")
     void createUser() {
         when(paymentMethodService.getPaymentMethodByName(userRequest.getPaymentMethod())).thenReturn(Optional.ofNullable(paymentMethod));
         when(countryService.getCountryByName(userRequest.getCountry())).thenReturn(Optional.ofNullable(country));
@@ -178,6 +180,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("GIVEN a valid User ID WHEN deleteUserById method is called THEN delete a User")
     void deleteUserById() {
         Long userId = 1L;
 
@@ -195,6 +198,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("GIVEN an invalid User ID WHEN deleteUserById method is called THEN throw NoSuchElementException")
     void deleteUserByIdError() {
         Long userId = 1234L;
 
@@ -206,6 +210,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("GIVEN a valid User ID WHEN deleteUserById method is called THEN delete a User")
     void updateUserById() {
         long userId = 1L;
 
@@ -233,6 +238,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("GIVEN a valid UserRequest WHEN parseUser method is called THEN return a User")
     void parseUser() {
         when(paymentMethodService.getPaymentMethodByName(userRequest.getPaymentMethod())).thenReturn(Optional.ofNullable(paymentMethod));
         when(countryService.getCountryByName(userRequest.getCountry())).thenReturn(Optional.ofNullable(country));
@@ -264,6 +270,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("GIVEN a UserRequest with an invalid paymentMethod WHEN parseUser method is called THEN throw a PaymentMethodNotFoundException")
     void parseUserErrorPaymentMethod() {
         Throwable exception = assertThrows(PaymentMethodNotFoundException.class, () -> userService.parseUser(userRequest));
 
@@ -274,6 +281,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("GIVEN a UserRequest with an invalid country WHEN parseUser method is called THEN throw a CountryNotFoundException")
     void parseUserErrorCountry() {
         when(paymentMethodService.getPaymentMethodByName(userRequest.getPaymentMethod())).thenReturn(Optional.ofNullable(paymentMethod));
 
@@ -286,6 +294,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("GIVEN a list of UserRequest WHEN loadListOfUsers method is called THEN save the list and return OK")
     void loadListOfUsers() {
 
         List<User> userList = Arrays.asList(testUser, testUser, testUser);
@@ -307,8 +316,8 @@ class UserServiceTest {
         assertEquals(userList, result);
     }
 
-
     @Test
+    @DisplayName("GIVEN a valid User ID WHEN getUserById method is called THEN return a User")
     void getUserById() {
         long userId = 1L;
 
@@ -322,6 +331,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("GIVEN an invalid User ID WHEN findById method is called THEN throw NoSuchElementException")
     void getUserByIdError() {
         long userId = 1L;
 
@@ -336,6 +346,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("GIVEN a valid User name WHEN getUserByName method is called THEN return OK and a User")
     void getUserByName() {
         String name = "Antonio";
 
@@ -355,6 +366,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("GIVEN an invalid User name WHEN getUserByName method is called THEN return empty list")
     void getUserByNameError() {
         String name = "NonExistentName";
 
@@ -363,11 +375,9 @@ class UserServiceTest {
 
         Throwable exception = assertThrows(NoUsersWithThatNameException.class, () -> userService.getUserByName(name));
 
-
         assertEquals("User not found", exception.getMessage());
 
         verify(userRepository, times(1)).findByName(name);
-
     }
 
 }
