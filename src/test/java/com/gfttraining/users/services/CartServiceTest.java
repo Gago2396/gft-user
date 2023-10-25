@@ -2,6 +2,7 @@ package com.gfttraining.users.services;
 
 import com.gfttraining.users.exceptions.CartConnectionRefusedException;
 import com.gfttraining.users.exceptions.CartResponseFailedException;
+import com.gfttraining.users.models.Address;
 import com.gfttraining.users.models.Cart;
 import com.gfttraining.users.models.Status;
 import com.gfttraining.users.repositories.CartRepository;
@@ -33,22 +34,27 @@ class CartServiceTest {
 
     private CartService cartService;
 
+    private List<Cart> cartList;
+
     @BeforeEach
     void setUp() {
         cartService = new CartService(cartRepository);
-        List<Cart> carts = new ArrayList<>();
+
+        Cart cart1 = new Cart(1L, 1L, Status.SUBMITTED, new BigDecimal("111.3"), new BigDecimal("4.5"));
+        Cart cart2 = new Cart(2L, 1L, Status.DRAFT, new BigDecimal("33.3"), new BigDecimal("23.5"));
+        Cart cart3 = new Cart(1L, 1L, Status.SUBMITTED, new BigDecimal("50.3"), new BigDecimal("4.5"));
+
+        // Cart List
+        cartList = new ArrayList<>();
+        cartList.add(cart1);
+        cartList.add(cart2);
+        cartList.add(cart3);
 
     }
 
     @Test
     @DisplayName("GIVEN a userId WHEN calling to the carts microservice getCartsById THEN return the result of fidelityPoints")
     void getFidelityPoints() throws CartResponseFailedException, CartConnectionRefusedException {
-        Cart cart1 = new Cart(1L, 1L, Status.SUBMITTED, new BigDecimal("111.3"), new BigDecimal("4.5"));
-        Cart cart2 = new Cart(2L, 1L, Status.DRAFT, new BigDecimal("33.3"), new BigDecimal("23.5"));
-        Cart cart3 = new Cart(1L, 1L, Status.SUBMITTED, new BigDecimal("50.3"), new BigDecimal("4.5"));
-
-        List<Cart> cartList = Arrays.asList(cart1, cart2, cart3);
-
         Long user = 1L;
 
         when(cartRepository.getCartById(user)).thenReturn(cartList);
