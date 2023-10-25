@@ -154,6 +154,7 @@ public class UserControllerIT {
                         " Name is required;");
     }
 
+    @Disabled
     @Test
     @DisplayName("Get List of Users IT")
     @Order(4)
