@@ -277,4 +277,30 @@ public class UserControllerIT {
                 .jsonPath("$.fidelityPoints").isEqualTo(300)
                 .jsonPath("$.averagePurchase").isEqualTo(85.0);
     }
+
+    @Test
+    @DisplayName("Delete User by ID Integration Test")
+    @Order(9)
+    void deleteUserByIdTest() {
+        long userIdToDelete = 11L;
+
+        client.delete().uri("/users/" + userIdToDelete)
+                .exchange()
+                .expectStatus().isOk();
+
+        client.get().uri("/users/" + userIdToDelete)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    @DisplayName("Get Deleted User by ID - Not Found Test")
+    @Order(10)
+    void getDeletedUserByIdTest() {
+        long deletedUserId = 11L;
+
+        client.get().uri("/users/" + deletedUserId)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
 }
