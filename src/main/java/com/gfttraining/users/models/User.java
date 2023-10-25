@@ -17,7 +17,6 @@ public class User {
     private Long id;
 
     private String name;
-
     private String lastName;
 
     @ManyToOne
@@ -29,7 +28,6 @@ public class User {
     private PaymentMethod paymentMethod;
 
     private Integer fidelityPoints;
-
     private Double averagePurchase;
 
 }
