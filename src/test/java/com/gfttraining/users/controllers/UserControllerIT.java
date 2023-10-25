@@ -240,7 +240,41 @@ public class UserControllerIT {
                 .jsonPath("$[99].name").doesNotExist();
     }
 
+    // LOAD TEST
 
+    @Test
+    @DisplayName("Update User by ID Integration Test")
+    @Order(8)
+    void updateUserByIdTest() {
+        long userIdToUpdate = 1L;
+        UserRequest updatedUser = new UserRequest(
+                "Carlos",
+                "Gonzalez",
+                "Industria",
+                "Sabadell",
+                "Barcelona",
+                57362,
+                "Spain",
+                "Paypal",
+                300,
+                85.0
+        );
 
-
+        client.put().uri("/users/" + userIdToUpdate)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(updatedUser)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.name").isEqualTo("Carlos")
+                .jsonPath("$.lastName").isEqualTo("Gonzalez")
+                .jsonPath("$.address.street").isEqualTo("Industria")
+                .jsonPath("$.address.city").isEqualTo("Sabadell")
+                .jsonPath("$.address.province").isEqualTo("Barcelona")
+                .jsonPath("$.address.postalCode").isEqualTo(57362)
+                .jsonPath("$.address.country.name").isEqualTo("Spain")
+                .jsonPath("$.paymentMethod.name").isEqualTo("Paypal")
+                .jsonPath("$.fidelityPoints").isEqualTo(300)
+                .jsonPath("$.averagePurchase").isEqualTo(85.0);
+    }
 }
