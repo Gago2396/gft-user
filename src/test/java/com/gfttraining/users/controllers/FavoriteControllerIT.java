@@ -57,7 +57,7 @@ public class FavoriteControllerIT {
     void postCreateFavoriteTest() throws JSONException {
         FavoriteRequest favoriteRequest = new FavoriteRequest(1L, 3L);
 
-        client.post().uri("/users/favorites")
+        client.post().uri("/favorites")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(favoriteRequest)
                 .exchange()
@@ -87,7 +87,7 @@ public class FavoriteControllerIT {
     void postCreateFavoriteTestNull() {
         FavoriteRequest favoriteRequest = new FavoriteRequest(null, 3L);
 
-        client.post().uri("/users/favorites")
+        client.post().uri("/favorites")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(favoriteRequest)
                 .exchange()
@@ -104,7 +104,7 @@ public class FavoriteControllerIT {
     void postCreateFavoriteTestInvalid() {
         FavoriteRequest favoriteRequest = new FavoriteRequest(134L, 3L);
 
-        client.post().uri("/users/favorites")
+        client.post().uri("/favorites")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(favoriteRequest)
                 .exchange()
@@ -117,7 +117,7 @@ public class FavoriteControllerIT {
     @DisplayName("GIVEN a userId WHEN a get is made to /users/favorites THEN it should return 200 and FavoriteDTO")
     @Order(4)
     void getFavoriteByIdTest() {
-        client.get().uri("/users/favorites/1")
+        client.get().uri("/favorites/user/1")
                 .exchange()
 
                 .expectStatus().isOk()
@@ -145,7 +145,7 @@ public class FavoriteControllerIT {
     void deleteFavoriteTest() {
         FavoriteRequest favoriteRequest = new FavoriteRequest(1L, 3L);
 
-        client.method(HttpMethod.DELETE).uri("/users/favorites/")
+        client.method(HttpMethod.DELETE).uri("/favorites")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(favoriteRequest)
                 .exchange()
@@ -161,7 +161,7 @@ public class FavoriteControllerIT {
     void deleteFavoriteTestInvalid() {
         FavoriteRequest favoriteRequest = new FavoriteRequest(1234L, 3L);
 
-        client.method(HttpMethod.DELETE).uri("/users/favorites/")
+        client.method(HttpMethod.DELETE).uri("/favorites")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(favoriteRequest)
                 .exchange()
@@ -174,7 +174,7 @@ public class FavoriteControllerIT {
     @DisplayName("GIVEN a userId WHEN a get is made to /users/favorites THEN it should return 200 and FavoriteDTO")
     @Order(7)
     void getFavoriteByIdTestNotFound() {
-        client.get().uri("/users/favorites/1")
+        client.get().uri("/favorites/user/1")
                 .exchange()
 
                 .expectStatus().isOk()
@@ -200,7 +200,7 @@ public class FavoriteControllerIT {
     @DisplayName("GIVEN a non existing User WHEN a get is made to /users/favorites/1234 THEN it should return Not Found")
     @Order(8)
     void getFavoriteByIdTestInvalid() {
-        client.get().uri("/users/favorites/1234")
+        client.get().uri("/favorites/user/1234")
                 .exchange()
 
                 .expectStatus().isNotFound()

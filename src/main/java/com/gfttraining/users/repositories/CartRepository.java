@@ -1,22 +1,10 @@
 package com.gfttraining.users.repositories;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
 import com.gfttraining.users.exceptions.CartConnectionRefusedException;
 import com.gfttraining.users.exceptions.CartResponseFailedException;
 import com.gfttraining.users.models.Cart;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -24,9 +12,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @Repository
@@ -37,10 +23,15 @@ public class CartRepository {
         this.restTemplate = restTemplate;
     }
 
+
     @Value("${cartMicroservice.url}")
     public String externalServiceUrl;
 
+    @Value("${cartMicroservice.port}")
+    public String port;
+
     public List<Cart> getCartById(Long user) throws CartConnectionRefusedException, CartResponseFailedException {
+
 
 
         HttpHeaders headers = new HttpHeaders();
@@ -50,7 +41,7 @@ public class CartRepository {
 
         try{
             ResponseEntity<List<Cart>> responseEntity = restTemplate.exchange(
-                    "http://localhost:8085"+"/carts/1",
+                    externalServiceUrl + ":" + port + "/carts/" + user,
                     HttpMethod.GET,
                     requestEntity,
                     new ParameterizedTypeReference<List<Cart>>() {}
