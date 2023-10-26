@@ -167,7 +167,7 @@ public class UserControllerIT {
             "return a list of users with their details including all attributes")
     @Order(4)
     void getListOfUsersTest() {
-        client.get().uri("/users/list")
+        client.get().uri("/users")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -224,7 +224,7 @@ public class UserControllerIT {
     @Order(6)
     void getListOfUsersByNameTest() {
         String nameToFilter = "John";
-        client.get().uri("/users/list?name=" + nameToFilter)
+        client.get().uri("/users/search/" + nameToFilter)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -238,16 +238,16 @@ public class UserControllerIT {
                 .jsonPath("$[0].paymentMethod.name").isEqualTo("Credit Card")
                 .jsonPath("$[0].fidelityPoints").isEqualTo(100)
                 .jsonPath("$[0].averagePurchase").isEqualTo(75.50)
-                .jsonPath("$[10].name").isEqualTo("John")
-                .jsonPath("$[10].lastName").isEqualTo("Lennon")
-                .jsonPath("$[10].address.street").isEqualTo("123 Main St")
-                .jsonPath("$[10].address.city").isEqualTo("Liverpool")
-                .jsonPath("$[10].address.province").isEqualTo("Merseyside")
-                .jsonPath("$[10].address.postalCode").isEqualTo(13456)
-                .jsonPath("$[10].address.country.name").isEqualTo("Portugal")
-                .jsonPath("$[10].paymentMethod.name").isEqualTo("PayPal")
-                .jsonPath("$[10].fidelityPoints").isEqualTo(170)
-                .jsonPath("$[10].averagePurchase").isEqualTo(75.0)
+                .jsonPath("$[1].name").isEqualTo("John")
+                .jsonPath("$[1].lastName").isEqualTo("Lennon")
+                .jsonPath("$[1].address.street").isEqualTo("123 Main St")
+                .jsonPath("$[1].address.city").isEqualTo("Liverpool")
+                .jsonPath("$[1].address.province").isEqualTo("Merseyside")
+                .jsonPath("$[1].address.postalCode").isEqualTo(13456)
+                .jsonPath("$[1].address.country.name").isEqualTo("Portugal")
+                .jsonPath("$[1].paymentMethod.name").isEqualTo("PayPal")
+                .jsonPath("$[1].fidelityPoints").isEqualTo(170)
+                .jsonPath("$[1].averagePurchase").isEqualTo(75.0)
                 .jsonPath("$[99].name").doesNotExist();
     }
 

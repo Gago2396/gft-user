@@ -5,4 +5,7 @@ spring:
     name: application
     location: classpath:/,classpath:/config/,file:./config/
 cartMicroservice:
-  url: localhost
+  url: http://localhost
+  port: 8085
+server:
+  port: 8086
