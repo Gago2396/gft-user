@@ -1,5 +1,7 @@
 package com.gfttraining.users.controllers;
 
+import com.gfttraining.users.exceptions.CartConnectionRefusedException;
+import com.gfttraining.users.exceptions.CartResponseFailedException;
 import com.gfttraining.users.exceptions.PaymentMethodNotFoundException;
 import com.gfttraining.users.models.UserRequest;
 import com.gfttraining.users.models.User;
@@ -57,6 +59,11 @@ public class UserController {
     public ResponseEntity<?> deleteUserById(@PathVariable long id) {
         userService.deleteUserById(id);
         return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/fidelity-points")
+    public ResponseEntity<?> updateUserFidelityPoints(@PathVariable long id) throws CartResponseFailedException, CartConnectionRefusedException {
+        return new ResponseEntity<>(userService.updateUserFidelityPoints(id), HttpStatus.OK);
     }
 }
 

@@ -1,9 +1,14 @@
 package com.gfttraining.users.controllers;
 
+import com.gfttraining.users.models.Cart;
 import com.gfttraining.users.models.PaymentMethod;
 import com.gfttraining.users.models.User;
 import com.gfttraining.users.models.UserRequest;
+import com.gfttraining.users.repositories.CartRepository;
 import com.gfttraining.users.services.FavoriteService;
+import com.gfttraining.users.services.UserService;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import net.minidev.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +24,7 @@ import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
@@ -154,7 +160,6 @@ public class UserControllerIT {
                         " Name is required;");
     }
 
-    @Disabled
     @Test
     @DisplayName("Get List of Users IT")
     @Order(4)
@@ -247,7 +252,7 @@ public class UserControllerIT {
     @DisplayName("Update User by ID Integration Test")
     @Order(8)
     void updateUserByIdTest() {
-        long userIdToUpdate = 1L;
+        long userIdToUpdate = 2L;
         UserRequest updatedUser = new UserRequest(
                 "Carlos",
                 "Gonzalez",
@@ -304,4 +309,5 @@ public class UserControllerIT {
                 .exchange()
                 .expectStatus().isNotFound();
     }
+
 }

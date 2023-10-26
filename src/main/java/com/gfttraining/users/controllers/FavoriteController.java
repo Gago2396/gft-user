@@ -45,10 +45,4 @@ public class FavoriteController {
         return new ResponseEntity<>(favoriteService.searchUserFavorites(user), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteFavoriteByProduct(@PathVariable long id) {
-        favoriteService.deleteFavoriteByProduct(id);
-        return new ResponseEntity<>("Favorite deleted successfully", HttpStatus.OK);
-    }
-
 }
