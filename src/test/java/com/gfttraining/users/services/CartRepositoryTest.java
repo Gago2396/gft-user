@@ -5,6 +5,7 @@ import com.gfttraining.users.exceptions.CartResponseFailedException;
 import com.gfttraining.users.models.Cart;
 import com.gfttraining.users.models.Status;
 import com.gfttraining.users.repositories.CartRepository;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
@@ -54,7 +56,7 @@ public class CartRepositoryTest {
         ResponseEntity<List<Cart>> response = new ResponseEntity<>(cartList, HttpStatus.OK);
 
         when(restTemplate.exchange(
-                "http://"+ cartRepository.externalServiceUrl +":"+"8887"+"/carts/getCartsById/",
+                "http://localhost:8085"+"/carts/1",
                 HttpMethod.GET,
                 requestEntity,
                 new ParameterizedTypeReference<List<Cart>>() {}
@@ -83,7 +85,7 @@ public class CartRepositoryTest {
         ResponseEntity<List<Cart>> response = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 
         when(restTemplate.exchange(
-                "http://"+ cartRepository.externalServiceUrl +":"+"8887"+"/carts/getCartsById/",
+                "http://localhost:8085"+"/carts/1",
                 HttpMethod.GET,
                 requestEntity,
                 new ParameterizedTypeReference<List<Cart>>() {}
@@ -109,7 +111,7 @@ public class CartRepositoryTest {
         ResponseEntity<List<Cart>> response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         when(restTemplate.exchange(
-                "http://"+ cartRepository.externalServiceUrl +":"+"8887"+"/carts/getCartsById/",
+                "http://localhost:8085"+"/carts/1",
                 HttpMethod.GET,
                 requestEntity,
                 new ParameterizedTypeReference<List<Cart>>() {}
@@ -129,7 +131,7 @@ public class CartRepositoryTest {
         HttpEntity<Long> requestEntity = new HttpEntity<>(user, headers);
 
         when(restTemplate.exchange(
-                "http://"+ cartRepository.externalServiceUrl +":"+"8887"+"/carts/getCartsById/",
+                "http://localhost:8085"+"/carts/1",
                 HttpMethod.GET,
                 requestEntity,
                 new ParameterizedTypeReference<List<Cart>>() {}

@@ -1,5 +1,7 @@
 package com.gfttraining.users.controllers;
 
+import com.gfttraining.users.exceptions.CartConnectionRefusedException;
+import com.gfttraining.users.exceptions.CartResponseFailedException;
 import com.gfttraining.users.exceptions.PaymentMethodNotFoundException;
 import com.gfttraining.users.models.*;
 import com.gfttraining.users.services.UserService;
@@ -74,6 +76,7 @@ class UserControllerTest {
 
         // User
         testUser = new User();
+        testUser.setId(1L);
         testUser.setName("Antonio");
         testUser.setLastName("Garcia");
         testUser.setAddress(address);
@@ -336,5 +339,19 @@ class UserControllerTest {
         assertEquals(Arrays.asList(testUser, testUser, testUser), responseEntity.getBody());
 
         verify(userService, times(1)).getListOfUsers();
+    }
+
+    @Test
+    @DisplayName("GIVEN a validUserId WHEN updateFidelityPoints method is called THEN return the user updated")
+    void testUpdateUserFidelityPoints() throws CartResponseFailedException, CartConnectionRefusedException {
+
+        when(userService.updateUserFidelityPoints(testUser.getId())).thenReturn(testUser);
+
+        ResponseEntity<?> responseEntity = userController.updateUserFidelityPoints(testUser.getId());
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(testUser, responseEntity.getBody());
+
+        verify(userService, times(1)).updateUserFidelityPoints(testUser.getId());
     }
 }

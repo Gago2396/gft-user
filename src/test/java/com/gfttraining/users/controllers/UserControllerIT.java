@@ -1,9 +1,14 @@
 package com.gfttraining.users.controllers;
 
+import com.gfttraining.users.models.Cart;
 import com.gfttraining.users.models.PaymentMethod;
 import com.gfttraining.users.models.User;
 import com.gfttraining.users.models.UserRequest;
+import com.gfttraining.users.repositories.CartRepository;
 import com.gfttraining.users.services.FavoriteService;
+import com.gfttraining.users.services.UserService;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import net.minidev.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +24,7 @@ import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
@@ -59,7 +65,7 @@ public class UserControllerIT {
 */
 
     @Test
-    @DisplayName("Create User Integration Test")
+    @DisplayName("GIVEN a valid UserRequest, WHEN a POST request is made to /users, THEN it should create a user in the database")
     @Order(1)
     void createUserTest() {
         UserRequest userRequest = new UserRequest(
@@ -94,7 +100,8 @@ public class UserControllerIT {
     }
 
     @Test
-    @DisplayName("Create User IT with Null User - Bad Request")
+    @DisplayName("GIVEN a UserRequest with a null name, WHEN a POST request is made to /users, THEN it should return " +
+            "a Bad Request response with a 'Name is required' validation error")
     @Order(2)
     void postCreateUserTestNull() {
         UserRequest userRequest = new UserRequest(
@@ -120,7 +127,8 @@ public class UserControllerIT {
     }
 
     @Test
-    @DisplayName("Create User IT with Invalid Data - Bad Request: Name is required")
+    @DisplayName("GIVEN a UserRequest with missing 'name' property, WHEN a POST request is made to /users, " +
+            "THEN it should return a Bad Request response with a 'Name is required' validation error")
     @Order(3)
     void postCreateUserTestInvalid() {
         JSONObject userRequest = new JSONObject();
@@ -155,7 +163,8 @@ public class UserControllerIT {
     }
 
     @Test
-    @DisplayName("Get List of Users IT")
+    @DisplayName("GIVEN a list of users in the database, WHEN a GET request is made to /users/list, THEN it should " +
+            "return a list of users with their details including all attributes")
     @Order(4)
     void getListOfUsersTest() {
         client.get().uri("/users/list")
@@ -185,7 +194,8 @@ public class UserControllerIT {
     }
 
     @Test
-    @DisplayName("Get User by ID IT")
+    @DisplayName("GIVEN a user with ID 1 in the database, WHEN a GET request is made to /users/1, THEN it should " +
+            "return user details including all attributes")
     @Order(5)
     void getUserByIdTest() {
         client.get().uri("/users/1")
@@ -209,7 +219,8 @@ public class UserControllerIT {
     }
 
     @Test
-    @DisplayName("Get List of Users by Name IT")
+    @DisplayName("GIVEN multiple users in the database with names containing 'John', WHEN a GET request is made to " +
+            "/users/list?name=John, THEN it should return a list of users matching the criteria including all attributes")
     @Order(6)
     void getListOfUsersByNameTest() {
         String nameToFilter = "John";
@@ -240,13 +251,13 @@ public class UserControllerIT {
                 .jsonPath("$[99].name").doesNotExist();
     }
 
-    // LOAD TEST
 
     @Test
-    @DisplayName("Update User by ID Integration Test")
+    @DisplayName("GIVEN an existing user with ID 1 in the database, WHEN a PUT request is made to /users/1 to update " +
+            "user information, THEN it should update the user's data and return the updated user details")
     @Order(8)
     void updateUserByIdTest() {
-        long userIdToUpdate = 1L;
+        long userIdToUpdate = 2L;
         UserRequest updatedUser = new UserRequest(
                 "Carlos",
                 "Gonzalez",
@@ -279,7 +290,8 @@ public class UserControllerIT {
     }
 
     @Test
-    @DisplayName("Delete User by ID Integration Test")
+    @DisplayName("GIVEN an existing user with ID 11 in the database, WHEN a DELETE request is made to /users/11, " +
+            "THEN the user should be deleted successfully")
     @Order(9)
     void deleteUserByIdTest() {
         long userIdToDelete = 11L;
@@ -294,7 +306,8 @@ public class UserControllerIT {
     }
 
     @Test
-    @DisplayName("Get Deleted User by ID - Not Found Test")
+    @DisplayName("GIVEN a deleted user with ID 11, WHEN a GET request is made to /users/11, " +
+            "THEN it should return 'Not Found'")
     @Order(10)
     void getDeletedUserByIdTest() {
         long deletedUserId = 11L;
@@ -303,4 +316,5 @@ public class UserControllerIT {
                 .exchange()
                 .expectStatus().isNotFound();
     }
+
 }

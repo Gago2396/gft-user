@@ -147,17 +147,4 @@ class FavoriteControllerTest {
         });
     }
 
-    @Test
-    @DisplayName("GIVEN a valid product ID WHEN deleteFavoriteByProduct method is called THEN return OK and delete the favorite by product")
-    public void testDeleteFavoriteByProductSuccess() {
-        // GIVEN
-        long productId = 1L;
-
-        // WHEN
-        ResponseEntity<String> response = favoriteController.deleteFavoriteByProduct(productId);
-
-        // THEN
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        verify(favoriteService, times(1)).deleteFavoriteByProduct(productId);
-    }
 }

@@ -1,5 +1,7 @@
 package com.gfttraining.users.controllers;
 
+import com.gfttraining.users.exceptions.CartConnectionRefusedException;
+import com.gfttraining.users.exceptions.CartResponseFailedException;
 import com.gfttraining.users.exceptions.CountryNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -61,6 +63,16 @@ public class UserControllerAdviceTest {
     }
 
     @Test
+    public void testCartConnectionRefusedException() {
+        UserControllerAdvice advice = new UserControllerAdvice();
+        CartConnectionRefusedException ex = mock(CartConnectionRefusedException.class);
+
+        ResponseEntity<String> response = advice.CartConnectionRefusedException(ex);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    }
+
+    @Test
     public void testHandleCountryNotFoundException() {
         UserControllerAdvice advice = new UserControllerAdvice();
         CountryNotFoundException ex = mock(CountryNotFoundException.class);
@@ -68,5 +80,15 @@ public class UserControllerAdviceTest {
         ResponseEntity<String> response = advice.CountryNotFoundException(ex);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    public void testCartResponseFailedException() {
+        UserControllerAdvice advice = new UserControllerAdvice();
+        CartResponseFailedException ex = mock(CartResponseFailedException.class);
+
+        ResponseEntity<String> response = advice.CartResponseFailedException(ex);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 }

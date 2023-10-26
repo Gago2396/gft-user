@@ -1,5 +1,7 @@
 package com.gfttraining.users.controllers;
 
+import com.gfttraining.users.exceptions.CartConnectionRefusedException;
+import com.gfttraining.users.exceptions.CartResponseFailedException;
 import com.gfttraining.users.exceptions.CountryNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,5 +45,15 @@ public class UserControllerAdvice {
     @ExceptionHandler(CountryNotFoundException.class)
     public ResponseEntity<String> CountryNotFoundException(CountryNotFoundException ex){
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(CartConnectionRefusedException.class)
+    public ResponseEntity<String> CartConnectionRefusedException(CartConnectionRefusedException ex){
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(CartResponseFailedException.class)
+    public ResponseEntity<String> CartResponseFailedException(CartResponseFailedException ex){
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

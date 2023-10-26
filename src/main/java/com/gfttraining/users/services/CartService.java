@@ -5,11 +5,13 @@ import com.gfttraining.users.exceptions.CartResponseFailedException;
 import com.gfttraining.users.models.Cart;
 import com.gfttraining.users.models.Status;
 import com.gfttraining.users.repositories.CartRepository;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class CartService {
 
     private final CartRepository cartRepository;

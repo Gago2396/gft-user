@@ -1,5 +1,7 @@
 package com.gfttraining.users.services;
 
+import com.gfttraining.users.exceptions.CartConnectionRefusedException;
+import com.gfttraining.users.exceptions.CartResponseFailedException;
 import com.gfttraining.users.exceptions.CountryNotFoundException;
 import com.gfttraining.users.exceptions.PaymentMethodNotFoundException;
 import com.gfttraining.users.models.*;
@@ -17,13 +19,15 @@ public class UserService {
     private final AddressService addressService;
     private final PaymentMethodService paymentMethodService;
     private final FavoriteRepository favoriteRepository;
+    private final CartService cartService;
 
-    public UserService(UserRepository userRepository, CountryService countryService, AddressService addressService, PaymentMethodService paymentMethodService, FavoriteRepository favoriteRepository) {
+    public UserService(UserRepository userRepository, CountryService countryService, AddressService addressService, PaymentMethodService paymentMethodService, FavoriteRepository favoriteRepository, CartService cartService) {
         this.userRepository = userRepository;
         this.countryService = countryService;
         this.addressService = addressService;
         this.paymentMethodService = paymentMethodService;
         this.favoriteRepository = favoriteRepository;
+        this.cartService = cartService;
     }
 
     public User createUser(UserRequest userRequest) {
@@ -45,6 +49,18 @@ public class UserService {
 
         User user = parseUser(updatedUserRequest);
         user.setId(userId);
+
+        return userRepository.save(user);
+    }
+
+    public User updateUserFidelityPoints(Long userId) throws CartResponseFailedException, CartConnectionRefusedException {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User not found"));
+
+        int fidelityPoints = cartService.getFidelityPoints(userId);
+
+        user.setFidelityPoints(fidelityPoints);
 
         return userRepository.save(user);
     }

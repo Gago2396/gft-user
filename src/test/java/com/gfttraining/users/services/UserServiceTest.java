@@ -7,7 +7,6 @@ import com.gfttraining.users.repositories.FavoriteRepository;
 import com.gfttraining.users.repositories.PaymentMethodRepository;
 import com.gfttraining.users.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,12 +14,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import com.gfttraining.users.exceptions.NoUsersWithThatNameException;
 import com.gfttraining.users.exceptions.PaymentMethodNotFoundException;
-import org.springframework.http.ResponseEntity;
 
 import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -68,9 +65,11 @@ class UserServiceTest {
 
     private PaymentMethod paymentMethod;
 
+    private CartService cartService;
+
     @BeforeEach
     void setUp() {
-        userService = new UserService(userRepository, countryService, addressService, paymentMethodService, favoriteRepository);
+        userService = new UserService(userRepository, countryService, addressService, paymentMethodService, favoriteRepository, cartService);
         userController = new UserController(userService);
 
         // PaymentMethod
