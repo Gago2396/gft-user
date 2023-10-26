@@ -42,15 +42,15 @@ public class UserControllerAdviceTest {
     }
 
 
-//    @Test
-//    public void testHandleMethodArgumentNotValidException() {
-//        UserControllerAdvice advice = new UserControllerAdvice();
-//        MethodArgumentNotValidException ex = mock(MethodArgumentNotValidException.class);
-//
-//        ResponseEntity<String> response = advice.handleMethodArgumentNotValidException(ex);
-//
-//        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-//    }
+    @Test
+    public void testHandleMethodArgumentNotValidException() {
+        UserControllerAdvice advice = new UserControllerAdvice();
+        MethodArgumentNotValidException ex = mock(MethodArgumentNotValidException.class);
+
+        ResponseEntity<String> response = advice.handleMethodArgumentNotValidException(ex);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
 
     @Test
     public void testHandleNoSuchElementException() {

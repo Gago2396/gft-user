@@ -361,7 +361,7 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("GIVEN an invalid User name WHEN getUserByName method is called THEN return empty list")
+    @DisplayName("GIVEN an invalid User name WHEN getUserByName method is called THEN throw NoUsersWithThatNameException")
     void getUserByNameError() {
         String name = "NonExistentName";
 
@@ -376,6 +376,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("GIVEN a valid endpoint call WHEN getListOfUsers method is called THEN return a list of Users and OK")
     void testGetListOfUsers() {
         List<User> expectedUsers = new ArrayList<>();
         expectedUsers.add(testUser);
@@ -389,24 +390,40 @@ class UserServiceTest {
         assertEquals(expectedUsers, result);
     }
 
-//    @Test
-//    void testUpdateUserFidelityPoints() throws CartResponseFailedException, CartConnectionRefusedException, CartResponseFailedException, CartConnectionRefusedException {
-//        long userId = 1L;
-//
-//        int simulatedFidelityPoints = 500;
-//
-//        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-//        when(cartService.getFidelityPoints(1L)).thenReturn(simulatedFidelityPoints);
-//
-//        User updatedUser = userService.updateUserFidelityPoints(userId);
-//        System.out.println(updatedUser);
-//        verify(userRepository, times(1)).findById(1L);
-//
-//        verify(cartService, times(1)).getFidelityPoints(1L);
-//
-//        assertEquals(simulatedFidelityPoints, updatedUser.getFidelityPoints());
-//
-//        verify(userRepository, times(1)).save(updatedUser);
-//    }
+    @Test
+    @DisplayName("GIVEN a valid User id WHEN updateUserFidelityPoints method is called THEN update its fidelity points")
+    void testUpdateUserFidelityPoints() throws CartResponseFailedException, CartConnectionRefusedException, CartResponseFailedException, CartConnectionRefusedException {
+        long userId = 1L;
+        int simulatedFidelityPoints = 500;
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
+        when(cartService.getFidelityPoints(userId)).thenReturn(simulatedFidelityPoints);
+        when(userRepository.save(testUser)).thenReturn(testUser);
+
+        User updatedUser = userService.updateUserFidelityPoints(userId);
+        System.out.println(updatedUser);
+        verify(userRepository, times(1)).findById(1L);
+
+        verify(cartService, times(1)).getFidelityPoints(1L);
+
+        assertEquals(simulatedFidelityPoints, updatedUser.getFidelityPoints());
+
+        verify(userRepository, times(1)).save(updatedUser);
+    }
+
+    @Test
+    @DisplayName("GIVEN an invalid User ID WHEN findById method is called THEN throw NoSuchElementException")
+    void getFidelityPointsError() {
+        long userId = 1L;
+
+        when(userRepository.findById(userId))
+                .thenReturn(Optional.empty());
+
+        Throwable exception = assertThrows(NoSuchElementException.class, () -> userService.updateUserFidelityPoints(userId));
+
+        assertEquals("User not found", exception.getMessage());
+
+        verify(userRepository, times(1)).findById(userId);
+    }
 
 }
