@@ -3,27 +3,41 @@ package com.gfttraining.users.controllers;
 import com.gfttraining.users.exceptions.CartConnectionRefusedException;
 import com.gfttraining.users.exceptions.CartResponseFailedException;
 import com.gfttraining.users.exceptions.CountryNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-
 import java.util.HashSet;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 public class UserControllerAdviceTest {
+    @Mock
+    private BindingResult bindingResult;
 
-    private UserController userController;
+    @Mock
+    MethodArgumentNotValidException methodArgumentNotValidException ;
+
+    private UserControllerAdvice userControllerAdvice;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        userControllerAdvice = new UserControllerAdvice();
+    }
 
     @Test
     @DisplayName("GIVEN ConstraintViolationException WHEN handleConstraintViolationException THEN return BAD_REQUEST response")
@@ -41,13 +55,15 @@ public class UserControllerAdviceTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
-    @Test
-    @DisplayName("GIVEN MethodArgumentNotValidException WHEN handleMethodArgumentNotValidException THEN return BAD_REQUEST response")
-    public void testHandleMethodArgumentNotValidException() {
-        UserControllerAdvice advice = new UserControllerAdvice();
-        MethodArgumentNotValidException ex = mock(MethodArgumentNotValidException.class);
 
-        ResponseEntity<String> response = advice.handleMethodArgumentNotValidException(ex);
+    @Test
+    public void testHandleMethodArgumentNotValidException() {
+        FieldError fieldError = new FieldError("objectName", "fieldName", "error message");
+
+        when(bindingResult.getAllErrors()).thenReturn(List.of(fieldError));
+        when(methodArgumentNotValidException.getBindingResult()).thenReturn(bindingResult);
+
+        ResponseEntity<String> response = userControllerAdvice.handleMethodArgumentNotValidException(methodArgumentNotValidException);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
