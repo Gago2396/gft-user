@@ -3,6 +3,12 @@ info:
   title: userAPI
   description: API documentation for users and favorites
   version: 1.0.0
+servers:
+  - url: http://localhost:8085/
+    description: Testing Server
+externalDocs:
+  description: Repository on GitHub
+  url: 'https://github.com/tuusuario/turepositorio'
 tags:
   - name: Management
     description: User management operations
