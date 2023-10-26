@@ -146,4 +146,5 @@ class FavoriteControllerTest {
             favoriteController.searchUserFavorites(userId);
         });
     }
+
 }

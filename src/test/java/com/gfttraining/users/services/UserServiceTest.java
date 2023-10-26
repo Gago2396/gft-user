@@ -1,7 +1,7 @@
 package com.gfttraining.users.services;
 
 import com.gfttraining.users.controllers.UserController;
-import com.gfttraining.users.exceptions.CountryNotFoundException;
+import com.gfttraining.users.exceptions.*;
 import com.gfttraining.users.models.*;
 import com.gfttraining.users.repositories.FavoriteRepository;
 import com.gfttraining.users.repositories.PaymentMethodRepository;
@@ -12,8 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import com.gfttraining.users.exceptions.NoUsersWithThatNameException;
-import com.gfttraining.users.exceptions.PaymentMethodNotFoundException;
 
 import java.util.*;
 
@@ -45,6 +43,9 @@ class UserServiceTest {
     private CountryService countryService;
 
     @Mock
+    private CartService cartService;
+
+    @Mock
     private AddressService addressService;
 
     private UserRequest userRequest;
@@ -65,7 +66,6 @@ class UserServiceTest {
 
     private PaymentMethod paymentMethod;
 
-    private CartService cartService;
 
     @BeforeEach
     void setUp() {
@@ -79,14 +79,17 @@ class UserServiceTest {
 
         // Country
         country = new Country();
+        country.setId(1L);
         country.setName("Spain");
 
         // Updated Country
         updatedCountry = new Country();
-        country.setName("Estonia");
+        updatedCountry.setId(2L);
+        updatedCountry.setName("Estonia");
 
         // Address
         address = new Address();
+        address.setId(1L);
         address.setStreet("23 Mayor");
         address.setCity("Valencia");
         address.setProvince("Valencia");
@@ -95,11 +98,12 @@ class UserServiceTest {
 
         // Updated Address
         updatedAddress = new Address();
-        address.setStreet("23 Mayor Updated");
-        address.setCity("Valencia Updated");
-        address.setProvince("Valencia Updated");
-        address.setPostalCode(46022);
-        address.setCountry(updatedCountry);
+        updatedAddress.setId(2L);
+        updatedAddress.setStreet("23 Mayor Updated");
+        updatedAddress.setCity("Valencia Updated");
+        updatedAddress.setProvince("Valencia Updated");
+        updatedAddress.setPostalCode(46022);
+        updatedAddress.setCountry(updatedCountry);
 
         // User
         testUser = new User();
@@ -112,6 +116,7 @@ class UserServiceTest {
 
         // Updated User
         updatedTestUser = new User();
+        updatedTestUser.setId(1L);
         updatedTestUser.setName("Antonio Updated");
         updatedTestUser.setLastName("Garcia Updated");
         updatedTestUser.setAddress(address);
@@ -134,48 +139,31 @@ class UserServiceTest {
 
         // Updated UserRequest
         updatedUserRequest = new UserRequest();
-        updatedUserRequest.setName("Alexelcapo");
-        updatedUserRequest.setLastName("Jimeno");
-        updatedUserRequest.setStreet("45 Menor");
-        updatedUserRequest.setCity("Madrid");
-        updatedUserRequest.setProvince("Madrid");
-        updatedUserRequest.setPostalCode(46123);
-        updatedUserRequest.setCountry("Estonia");
+        updatedUserRequest.setName("Antonio Updated");
+        updatedUserRequest.setLastName("Garcia Updated");
+        updatedUserRequest.setStreet("23 Mayor");
+        updatedUserRequest.setCity("Valencia");
+        updatedUserRequest.setProvince("Valencia");
+        updatedUserRequest.setPostalCode(46022);
+        updatedUserRequest.setCountry("Spain");
         updatedUserRequest.setPaymentMethod("PayPal");
-        updatedUserRequest.setFidelityPoints(400);
-        updatedUserRequest.setAveragePurchase(150.5);
+        updatedUserRequest.setFidelityPoints(300);
+        updatedUserRequest.setAveragePurchase(120.0);
     }
 
     @Test
-    @DisplayName("GIVEN a valid UserRequest WHEN save method is called THEN save an User and return an User and CREATED")
-    void createUser() {
+    void testCreateUser() {
         when(paymentMethodService.getPaymentMethodByName(userRequest.getPaymentMethod())).thenReturn(Optional.ofNullable(paymentMethod));
         when(countryService.getCountryByName(userRequest.getCountry())).thenReturn(Optional.ofNullable(country));
+        when(userRepository.save(testUser)).thenReturn(testUser);
 
-        Country userCountry = countryService.getCountryByName(userRequest.getCountry()).get();
-        AddressRequest addressRequest = new AddressRequest(userRequest.getStreet(), userRequest.getCity(), userRequest.getProvince(), userRequest.getPostalCode(), userCountry);
+        AddressRequest addressRequest = new AddressRequest(userRequest.getStreet(), userRequest.getCity(), userRequest.getProvince(), userRequest.getPostalCode(), country);
         when(addressService.parseAddress(addressRequest)).thenReturn(address);
 
-        Optional<PaymentMethod> testPaymentMethod = paymentMethodService.getPaymentMethodByName(userRequest.getPaymentMethod());
+        User createdUser = userService.createUser(userRequest);
 
-        Address testAddress = addressService.parseAddress(addressRequest);
-
-        User parsedUser = new User();
-        parsedUser.setName(userRequest.getName());
-        parsedUser.setLastName(userRequest.getLastName());
-        parsedUser.setAddress(testAddress);
-        parsedUser.setFidelityPoints(userRequest.getFidelityPoints());
-        parsedUser.setAveragePurchase(userRequest.getAveragePurchase());
-        parsedUser.setPaymentMethod(testPaymentMethod.get());
-
-        assertEquals("Antonio", parsedUser.getName());
-        assertEquals("Garcia", parsedUser.getLastName());
-        assertEquals("23 Mayor Updated", parsedUser.getAddress().getStreet());
-        assertEquals("Valencia Updated", parsedUser.getAddress().getCity());
-        assertEquals("PayPal", parsedUser.getPaymentMethod().getName());
-
-        verify(paymentMethodService, times(1)).getPaymentMethodByName(userRequest.getPaymentMethod());
-        verify(countryService, times(1)).getCountryByName(userRequest.getCountry());
+        assertNotNull(createdUser);
+        assertEquals(testUser, createdUser);
     }
 
     @Test
@@ -209,31 +197,39 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("GIVEN a valid User ID WHEN deleteUserById method is called THEN delete a User")
+    @DisplayName("GIVEN a valid User ID WHEN updateUserById method is called THEN update a User")
     void updateUserById() {
         long userId = 1L;
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
-        when(paymentMethodService.getPaymentMethodByName(userRequest.getPaymentMethod())).thenReturn(Optional.ofNullable(paymentMethod));
-        when(countryService.getCountryByName(userRequest.getCountry())).thenReturn(Optional.ofNullable(country));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(updatedTestUser));
+        when(paymentMethodService.getPaymentMethodByName(updatedUserRequest.getPaymentMethod())).thenReturn(Optional.ofNullable(paymentMethod));
+        when(countryService.getCountryByName(updatedUserRequest.getCountry())).thenReturn(Optional.ofNullable(country));
+        when(userRepository.save(updatedTestUser)).thenReturn(updatedTestUser);
 
-        AddressRequest addressRequest = new AddressRequest(userRequest.getStreet(), userRequest.getCity(), userRequest.getProvince(), userRequest.getPostalCode(), country);
+        AddressRequest addressRequest = new AddressRequest(updatedUserRequest.getStreet(), updatedUserRequest.getCity(), updatedUserRequest.getProvince(), updatedUserRequest.getPostalCode(), country);
         when(addressService.parseAddress(addressRequest)).thenReturn(address);
 
-        userRepository.findById(userId);
-        User resultParsedUser = userService.parseUser(userRequest);
+        User updatedUser = userService.updateUserById(userId, updatedUserRequest);
 
-        resultParsedUser.setId(userId);
-        userRepository.save(resultParsedUser);
-
-        assertEquals("Antonio", resultParsedUser.getName());
-        assertEquals("Garcia", resultParsedUser.getLastName());
-        assertEquals("23 Mayor Updated", resultParsedUser.getAddress().getStreet());
-        assertEquals("Valencia Updated", resultParsedUser.getAddress().getCity());
-        assertEquals("PayPal", resultParsedUser.getPaymentMethod().getName());
+        assertEquals("Antonio Updated", updatedUser.getName());
+        assertEquals("Garcia Updated", updatedUser.getLastName());
+        assertEquals("23 Mayor", updatedUser.getAddress().getStreet());
+        assertEquals("Valencia", updatedUser.getAddress().getCity());
+        assertEquals("PayPal", updatedUser.getPaymentMethod().getName());
 
         verify(paymentMethodService, times(1)).getPaymentMethodByName(userRequest.getPaymentMethod());
         verify(countryService, times(1)).getCountryByName(userRequest.getCountry());
+    }
+
+
+    @Test
+    @DisplayName("GIVEN a valid User ID WHEN deleteUserById method is called THEN delete a User")
+    void updateUserByIdError() {
+        long userId = 99999L;
+
+        Throwable exception = assertThrows(NoSuchElementException.class, () -> userService.updateUserById(userId, updatedUserRequest));
+
+        assertEquals("User not found", exception.getMessage());
     }
 
     @Test
@@ -260,8 +256,8 @@ class UserServiceTest {
 
         assertEquals("Antonio", parsedUser.getName());
         assertEquals("Garcia", parsedUser.getLastName());
-        assertEquals("23 Mayor Updated", parsedUser.getAddress().getStreet());
-        assertEquals("Valencia Updated", parsedUser.getAddress().getCity());
+        assertEquals("23 Mayor", parsedUser.getAddress().getStreet());
+        assertEquals("Valencia", parsedUser.getAddress().getCity());
         assertEquals("PayPal", parsedUser.getPaymentMethod().getName());
 
         verify(paymentMethodService, times(1)).getPaymentMethodByName(userRequest.getPaymentMethod());
@@ -322,9 +318,9 @@ class UserServiceTest {
 
         when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(testUser));
 
-        Optional<User> testIdUser = userRepository.findById(userId);
-        assertEquals("Antonio", testIdUser.get().getName());
-        assertEquals("Garcia", testIdUser.get().getLastName());
+        User testIdUser = userService.getUserById(userId);
+        assertEquals("Antonio", testIdUser.getName());
+        assertEquals("Garcia", testIdUser.getLastName());
 
         verify(userRepository, times(1)).findById(userId);
     }
@@ -335,9 +331,9 @@ class UserServiceTest {
         long userId = 1L;
 
         when(userRepository.findById(userId))
-                .thenThrow(new NoSuchElementException("User not found"));
+                .thenReturn(Optional.empty());
 
-        Throwable exception = assertThrows(NoSuchElementException.class, () -> userRepository.findById(userId));
+        Throwable exception = assertThrows(NoSuchElementException.class, () -> userService.getUserById(userId));
 
         assertEquals("User not found", exception.getMessage());
 
@@ -358,14 +354,14 @@ class UserServiceTest {
 
         assertEquals("Antonio", firstUser.getName());
         assertEquals("Garcia", firstUser.getLastName());
-        assertEquals("Valencia Updated", firstUser.getAddress().getCity());
+        assertEquals("Valencia", firstUser.getAddress().getCity());
         assertEquals(3, userList.size());
 
         verify(userRepository, times(1)).findByName(name);
     }
 
     @Test
-    @DisplayName("GIVEN an invalid User name WHEN getUserByName method is called THEN return empty list")
+    @DisplayName("GIVEN an invalid User name WHEN getUserByName method is called THEN throw NoUsersWithThatNameException")
     void getUserByNameError() {
         String name = "NonExistentName";
 
@@ -377,6 +373,57 @@ class UserServiceTest {
         assertEquals("User not found", exception.getMessage());
 
         verify(userRepository, times(1)).findByName(name);
+    }
+
+    @Test
+    @DisplayName("GIVEN a valid endpoint call WHEN getListOfUsers method is called THEN return a list of Users and OK")
+    void testGetListOfUsers() {
+        List<User> expectedUsers = new ArrayList<>();
+        expectedUsers.add(testUser);
+        expectedUsers.add(testUser);
+        expectedUsers.add(testUser);
+
+        when(userRepository.findAll()).thenReturn(expectedUsers);
+
+        List<User> result = userService.getListOfUsers();
+
+        assertEquals(expectedUsers, result);
+    }
+
+    @Test
+    @DisplayName("GIVEN a valid User id WHEN updateUserFidelityPoints method is called THEN update its fidelity points")
+    void testUpdateUserFidelityPoints() throws CartResponseFailedException, CartConnectionRefusedException, CartResponseFailedException, CartConnectionRefusedException {
+        long userId = 1L;
+        int simulatedFidelityPoints = 500;
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
+        when(cartService.getFidelityPoints(userId)).thenReturn(simulatedFidelityPoints);
+        when(userRepository.save(testUser)).thenReturn(testUser);
+
+        User updatedUser = userService.updateUserFidelityPoints(userId);
+        System.out.println(updatedUser);
+        verify(userRepository, times(1)).findById(1L);
+
+        verify(cartService, times(1)).getFidelityPoints(1L);
+
+        assertEquals(simulatedFidelityPoints, updatedUser.getFidelityPoints());
+
+        verify(userRepository, times(1)).save(updatedUser);
+    }
+
+    @Test
+    @DisplayName("GIVEN an invalid User ID WHEN findById method is called THEN throw NoSuchElementException")
+    void getFidelityPointsError() {
+        long userId = 1L;
+
+        when(userRepository.findById(userId))
+                .thenReturn(Optional.empty());
+
+        Throwable exception = assertThrows(NoSuchElementException.class, () -> userService.updateUserFidelityPoints(userId));
+
+        assertEquals("User not found", exception.getMessage());
+
+        verify(userRepository, times(1)).findById(userId);
     }
 
 }

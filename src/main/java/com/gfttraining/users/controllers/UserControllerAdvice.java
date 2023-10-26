@@ -27,12 +27,11 @@ public class UserControllerAdvice {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
 
         StringBuilder errorMessage = new StringBuilder("Validation error(s):\n");
-        ex.getBindingResult().getAllErrors().forEach(error -> {
-            errorMessage.append("\s").append(error.getDefaultMessage()).append(";\n");
-        });
+        ex.getBindingResult().getAllErrors().forEach(error -> errorMessage.append(" ").append(error.getDefaultMessage()).append(";\n"));
 
         return new ResponseEntity<>(errorMessage.toString(), HttpStatus.BAD_REQUEST);
     }
@@ -53,7 +52,7 @@ public class UserControllerAdvice {
     }
 
     @ExceptionHandler(CartResponseFailedException.class)
-    public ResponseEntity<String> CartResponseFailedException(CartConnectionRefusedException ex){
+    public ResponseEntity<String> CartResponseFailedException(CartResponseFailedException ex){
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }
