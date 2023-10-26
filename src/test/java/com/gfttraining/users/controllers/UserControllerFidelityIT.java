@@ -62,6 +62,8 @@ public class UserControllerFidelityIT {
 
         String cartJsonTemplate = "{ \"id\": %d, \"userId\": %d, \"status\": \"%s\", \"finalPrice\": %d, \"finalWeight\": %d }";
 
+        Long user = 1L;
+
         List<String> cartJsonList = new ArrayList<>();
         cartJsonList.add(String.format(cartJsonTemplate, 1, 1, "DRAFT", 0, 0));
         cartJsonList.add(String.format(cartJsonTemplate, 2, 1, "SUBMITTED", 10, 5));
@@ -73,7 +75,7 @@ public class UserControllerFidelityIT {
 
         System.out.println(responseBody);
 
-        wireMockServer.stubFor(WireMock.get(WireMock.urlMatching("/carts/1"))
+        wireMockServer.stubFor(WireMock.get(WireMock.urlMatching("/carts/" + user))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")

@@ -1,4 +1,4 @@
-package com.gfttraining.users.services;
+package com.gfttraining.users.repositories;
 
 import com.gfttraining.users.exceptions.CartConnectionRefusedException;
 import com.gfttraining.users.exceptions.CartResponseFailedException;
@@ -36,6 +36,8 @@ public class CartRepositoryTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         cartRepository = new CartRepository(restTemplate);
+        cartRepository.setPort("8085");
+        cartRepository.setExternalServiceUrl("http://localhost");
     }
 
     @Test
@@ -56,7 +58,7 @@ public class CartRepositoryTest {
         ResponseEntity<List<Cart>> response = new ResponseEntity<>(cartList, HttpStatus.OK);
 
         when(restTemplate.exchange(
-                "http://localhost:8085"+"/carts/1",
+                "http://localhost:8085"+"/carts/" + user,
                 HttpMethod.GET,
                 requestEntity,
                 new ParameterizedTypeReference<List<Cart>>() {}
@@ -85,7 +87,7 @@ public class CartRepositoryTest {
         ResponseEntity<List<Cart>> response = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 
         when(restTemplate.exchange(
-                "http://localhost:8085"+"/carts/1",
+                "http://localhost:8085"+"/carts/" + user,
                 HttpMethod.GET,
                 requestEntity,
                 new ParameterizedTypeReference<List<Cart>>() {}
@@ -111,7 +113,7 @@ public class CartRepositoryTest {
         ResponseEntity<List<Cart>> response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         when(restTemplate.exchange(
-                "http://localhost:8085"+"/carts/1",
+                "http://localhost:8085"+"/carts/" + user,
                 HttpMethod.GET,
                 requestEntity,
                 new ParameterizedTypeReference<List<Cart>>() {}
@@ -131,7 +133,7 @@ public class CartRepositoryTest {
         HttpEntity<Long> requestEntity = new HttpEntity<>(user, headers);
 
         when(restTemplate.exchange(
-                "http://localhost:8085"+"/carts/1",
+                "http://localhost:8085"+"/carts/" + user,
                 HttpMethod.GET,
                 requestEntity,
                 new ParameterizedTypeReference<List<Cart>>() {}

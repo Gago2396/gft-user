@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/users/favorites")
+@RequestMapping("/favorites")
 public class FavoriteController {
 
     private final FavoriteService favoriteService;
@@ -39,7 +39,7 @@ public class FavoriteController {
         return new ResponseEntity<>("Favorite deleted successfully", HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("user/{id}")
     public ResponseEntity<?> searchUserFavorites(@PathVariable long id) {
         User user = userService.getUserById(id);
         return new ResponseEntity<>(favoriteService.searchUserFavorites(user), HttpStatus.OK);
