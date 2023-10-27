@@ -1,5 +1,7 @@
 package com.gfttraining.users.controllers;
 
+import com.gfttraining.users.exceptions.CartConnectionRefusedException;
+import com.gfttraining.users.exceptions.CartResponseFailedException;
 import com.gfttraining.users.exceptions.CountryNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +27,11 @@ public class UserControllerAdvice {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
 
         StringBuilder errorMessage = new StringBuilder("Validation error(s):\n");
-        ex.getBindingResult().getAllErrors().forEach(error -> {
-            errorMessage.append("\s").append(error.getDefaultMessage()).append(";\n");
-        });
+        ex.getBindingResult().getAllErrors().forEach(error -> errorMessage.append(" ").append(error.getDefaultMessage()).append(";\n"));
 
         return new ResponseEntity<>(errorMessage.toString(), HttpStatus.BAD_REQUEST);
     }
@@ -43,5 +44,15 @@ public class UserControllerAdvice {
     @ExceptionHandler(CountryNotFoundException.class)
     public ResponseEntity<String> CountryNotFoundException(CountryNotFoundException ex){
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(CartConnectionRefusedException.class)
+    public ResponseEntity<String> CartConnectionRefusedException(CartConnectionRefusedException ex){
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(CartResponseFailedException.class)
+    public ResponseEntity<String> CartResponseFailedException(CartResponseFailedException ex){
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

@@ -2,6 +2,9 @@ package com.gfttraining.users.controllers;
 
 import com.gfttraining.users.models.FavoriteRequest;
 import com.gfttraining.users.services.FavoriteService;
+import netscape.javascript.JSObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,6 +12,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import springfox.documentation.spring.web.json.Json;
 
 import javax.annotation.PostConstruct;
 
@@ -39,19 +43,21 @@ public class FavoriteControllerIT {
     ========= ORDER =========
     1.- Create Favorite.
     2.- Create Favorite. - USER Null
-    3.- Create Favorite. - USER Not found
+    3.- Create Favorite. - USER Not Found
     4.- Get Favorite By ID
     5.- Delete Favorite By ID
-    6.- Get Favorite By ID - Not found
+    6.- Delete Favorite By ID - USER Not Found
+    7.- Get Favorite By ID - FAVORITE Not Found
+    8.- Get Favorite By ID - USER Not Found
     =========================
 */
     @Test
     @DisplayName("GIVEN a valid favoriteRequest When a post is made to /users/favorites Then it should be saved in database and return the saved favorite")
     @Order(1)
-    void postCreateFavoriteTest() {
+    void postCreateFavoriteTest() throws JSONException {
         FavoriteRequest favoriteRequest = new FavoriteRequest(1L, 3L);
 
-        client.post().uri("/users/favorites")
+        client.post().uri("/favorites")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(favoriteRequest)
                 .exchange()
@@ -81,7 +87,7 @@ public class FavoriteControllerIT {
     void postCreateFavoriteTestNull() {
         FavoriteRequest favoriteRequest = new FavoriteRequest(null, 3L);
 
-        client.post().uri("/users/favorites")
+        client.post().uri("/favorites")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(favoriteRequest)
                 .exchange()
@@ -98,7 +104,7 @@ public class FavoriteControllerIT {
     void postCreateFavoriteTestInvalid() {
         FavoriteRequest favoriteRequest = new FavoriteRequest(134L, 3L);
 
-        client.post().uri("/users/favorites")
+        client.post().uri("/favorites")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(favoriteRequest)
                 .exchange()
@@ -111,7 +117,7 @@ public class FavoriteControllerIT {
     @DisplayName("GIVEN a userId WHEN a get is made to /users/favorites THEN it should return 200 and FavoriteDTO")
     @Order(4)
     void getFavoriteByIdTest() {
-        client.get().uri("/users/favorites/1")
+        client.get().uri("/favorites/user/1")
                 .exchange()
 
                 .expectStatus().isOk()
@@ -139,7 +145,7 @@ public class FavoriteControllerIT {
     void deleteFavoriteTest() {
         FavoriteRequest favoriteRequest = new FavoriteRequest(1L, 3L);
 
-        client.method(HttpMethod.DELETE).uri("/users/favorites/")
+        client.method(HttpMethod.DELETE).uri("/favorites")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(favoriteRequest)
                 .exchange()
@@ -150,10 +156,25 @@ public class FavoriteControllerIT {
     }
 
     @Test
+    @DisplayName("GIVEN a favoriteRequest with not existing User WHEN a delete is made to /users/favorites THEN it return 404 Not Found")
+    @Order(5)
+    void deleteFavoriteTestInvalid() {
+        FavoriteRequest favoriteRequest = new FavoriteRequest(1234L, 3L);
+
+        client.method(HttpMethod.DELETE).uri("/favorites")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(favoriteRequest)
+                .exchange()
+
+                .expectStatus().isNotFound()
+                .expectBody().jsonPath("$").isEqualTo("User not found");
+    }
+
+    @Test
     @DisplayName("GIVEN a userId WHEN a get is made to /users/favorites THEN it should return 200 and FavoriteDTO")
-    @Order(6)
-    void getFavoriteByIdTestInvalid() {
-        client.get().uri("/users/favorites/1")
+    @Order(7)
+    void getFavoriteByIdTestNotFound() {
+        client.get().uri("/favorites/user/1")
                 .exchange()
 
                 .expectStatus().isOk()
@@ -173,5 +194,16 @@ public class FavoriteControllerIT {
                 .jsonPath("$.user.fidelityPoints").isEqualTo(100)
                 .jsonPath("$.user.averagePurchase").isEqualTo(75.50)
                 .jsonPath("$.favorites").isEmpty();
+    }
+
+    @Test
+    @DisplayName("GIVEN a non existing User WHEN a get is made to /users/favorites/1234 THEN it should return Not Found")
+    @Order(8)
+    void getFavoriteByIdTestInvalid() {
+        client.get().uri("/favorites/user/1234")
+                .exchange()
+
+                .expectStatus().isNotFound()
+                .expectBody().jsonPath("$").isEqualTo("User not found");
     }
 }

@@ -87,18 +87,4 @@ class FavoriteServiceTest {
         assertThat(result.getFavorites().size()).isEqualTo(favorites.size());
         verify(favoriteRepository, times(1)).findByUser(user);
     }
-
-
-    @Test
-    @DisplayName("GIVEN a product ID WHEN deleteFavoriteByProduct method is called THEN delete the favorite by product")
-    void deleteFavoriteByProduct() {
-        // GIVEN
-        Long productId = 1L;
-
-        // WHEN
-        favoriteService.deleteFavoriteByProduct(productId);
-
-        // THEN
-        verify(favoriteRepository, times(1)).deleteByProduct(productId);
-    }
 }

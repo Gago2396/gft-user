@@ -4,3 +4,8 @@ spring:
   config:
     name: application
     location: classpath:/,classpath:/config/,file:./config/
+cartMicroservice:
+  url: http://localhost
+  port: 8085
+server:
+  port: 8086

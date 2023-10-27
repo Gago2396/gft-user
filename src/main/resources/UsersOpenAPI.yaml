@@ -1,8 +1,14 @@
-openapi: 3.0.0
+openapi: 3.1.0
 info:
-  title: User Service for Store
+  title: userAPI
+  description: API documentation for users and favorites
   version: 1.0.0
-  description: Documentation for the store's user service. Find the source code on [GitHub](https://github.com/rafaelnieto96/gft-users/)
+servers:
+  - url: http://localhost:8085/
+    description: Testing Server
+externalDocs:
+  description: Repository on GitHub
+  url: 'https://github.com/tuusuario/turepositorio'
 tags:
   - name: Management
     description: User management operations
@@ -13,287 +19,265 @@ tags:
 paths:
   /users:
     post:
-      summary: User registration
+      summary: Create a new user
       tags:
         - Management
       requestBody:
-        required: true
         content:
           application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                last_name:
-                  type: string
-                address:
-                  type: string
-                payment_method:
-                  type: string
+            example:
+              name: John
+              lastName: Doe
+              street: Main St
+              city: City
+              province: Province
+              postalCode: 12345
+              country: Spain
+              paymentMethod: Credit Card
+              fidelityPoints: 10
+              averagePurchase: 50.0
       responses:
         '201':
           description: User created successfully
           content:
             application/json:
               example:
-                message: "User created successfully"
-                id: 123
+                id: 1
+                name: John
+                lastName: Doe
+                address:
+                  street: Main St
+                  city: City
+                  province: Province
+                  postalCode: 12345
+                  country: Spain
+                paymentMethod: Credit Card
+                fidelityPoints: 10
+                averagePurchase: 50.0
+        '400':
+          description: Bad request
+        '500':
+          description: Internal Server Error
+
+    get:
+      summary: Get a list of all users
+      tags:
+        - Search
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              example:
+                - id: 1
+                  name: John
+                  lastName: Doe
+                  address:
+                    street: Main St
+                    city: City
+                    province: Province
+                    postalCode: 12345
+                    country: Spain
+                  paymentMethod: Credit Card
+                  fidelityPoints: 10
+                  averagePurchase: 50.0
+        '500':
+          description: Internal Server Error
 
   /users/{id}:
+    get:
+      summary: Get user by ID
+      tags:
+        - Search
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User details
+          content:
+            application/json:
+              example:
+                id: 1
+                name: John
+                lastName: Doe
+                address:
+                  street: Main St
+                  city: City
+                  province: Province
+                  postalCode: 12345
+                  country: Spain
+                paymentMethod: Credit Card
+                fidelityPoints: 10
+                averagePurchase: 50.0
+        '404':
+          description: User not found
+        '500':
+          description: Internal Server Error
+
     put:
       summary: Update user by ID
       tags:
         - Management
       parameters:
-        - in: path
-          name: id
+        - name: id
+          in: path
           required: true
           schema:
             type: integer
       requestBody:
-        required: true
         content:
           application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                last_name:
-                  type: string
-                address:
-                  type: string
-                payment_method:
-                  type: string
+            example:
+              name: John
+              lastName: Doe
+              street: Updated St
+              city: Updated City
+              province: Updated Province
+              postalCode: 54321
+              country: Estonia
+              paymentMethod: PayPal
+              fidelityPoints: 20
+              averagePurchase: 75.0
       responses:
         '200':
           description: User updated successfully
           content:
             application/json:
               example:
-                message: "User updated successfully"
+                id: 1
+                name: John
+                lastName: Doe
+                address:
+                  street: Updated St
+                  city: Updated City
+                  province: Updated Province
+                  postalCode: 54321
+                  country: Estonia
+                paymentMethod: PayPal
+                fidelityPoints: 20
+                averagePurchase: 75.0
+        '404':
+          description: User not found
+        '500':
+          description: Internal Server Error
 
     delete:
       summary: Delete user by ID
       tags:
         - Management
       parameters:
-        - in: path
-          name: id
+        - name: id
+          in: path
           required: true
           schema:
             type: integer
       responses:
-        '204':
+        '200':
           description: User deleted successfully
+        '404':
+          description: User not found
+        '500':
+          description: Internal Server Error
 
+  /users/{id}/fidelity-points:
     get:
-      summary: Find user by ID
+      summary: Update user fidelity points by ID
       tags:
-        - Search
+        - Management
       parameters:
-        - in: path
-          name: id
+        - name: id
+          in: path
           required: true
           schema:
             type: integer
       responses:
         '200':
-          description: Data of the requested user
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  name:
-                    type: string
-                  last_name:
-                    type: string
-                  address:
-                    type: string
-                  payment_method:
-                    type: string
-                  id:
-                    type: integer
-                  loyalty_points:
-                    type: integer
-                  average_purchase:
-                    type: number
-                example:
-                  name: "John"
-                  last_name: "Doe"
-                  address: "123 Street"
-                  payment_method: "Visa"
-                  id: 456
-                  loyalty_points: 20
-                  average_purchase: 50.0
-
-  /users/search/{name}:
-    get:
-      summary: Search user by name
-      tags:
-        - Search
-      parameters:
-        - in: path
-          name: name
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: List of users matching the name
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                    last_name:
-                      type: string
-                    address:
-                      type: string
-                    payment_method:
-                      type: string
-                    id:
-                      type: integer
-                    loyalty_points:
-                      type: integer
-                    average_purchase:
-                      type: number
-                example:
-                  - name: "Anna"
-                    last_name: "Smith"
-                    address: "456 Avenue"
-                    payment_method: "Paypal"
-                    id: 789
-                    loyalty_points: 30
-                    average_purchase: 40.0
-                  - name: "Anna"
-                    last_name: "Doe"
-                    address: "123 Street"
-                    payment_method: "Visa"
-                    id: 456
-                    loyalty_points: 20
-                    average_purchase: 50.0
-
-  /users/list:
-    get:
-      summary: List all users
-      tags:
-        - Search
-      responses:
-        '200':
-          description: List of all users
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                    last_name:
-                      type: string
-                    address:
-                      type: string
-                    payment_method:
-                      type: string
-                    id:
-                      type: integer
-                    loyalty_points:
-                      type: integer
-                    average_purchase:
-                      type: number
-                example:
-                  - name: "Anna"
-                    last_name: "Smith"
-                    address: "456 Avenue"
-                    payment_method: "Paypal"
-                    id: 789
-                    loyalty_points: 30
-                    average_purchase: 40.0
-                  - name: "John"
-                    last_name: "Doe"
-                    address: "123 Street"
-                    payment_method: "Visa"
-                    id: 456
-                    loyalty_points: 20
-                    average_purchase: 50.0
-
-  /users/load:
-    post:
-      summary: Load list of users
-      tags:
-        - Search
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                type: object
-                properties:
-                  name:
-                    type: string
-                  last_name:
-                    type: string
-                  address:
-                    type: string
-                  payment_method:
-                    type: string
-      responses:
-        '201':
-          description: List of users loaded successfully
+          description: User fidelity points updated successfully
           content:
             application/json:
               example:
-                message: "List of users loaded successfully"
+                id: 1
+                name: John
+                fidelityPoints: 50
+        '404':
+          description: User not found
+        '500':
+          description: Internal Server Error
 
-  /users/favorite:
+  /favorites:
     post:
-      summary: Add favorite
+      summary: Add a favorite product
       tags:
         - Favorites
       requestBody:
-        required: true
         content:
           application/json:
-            schema:
-              type: object
-              properties:
-                user_id:
-                  type: integer
-                product_id:
-                  type: integer
+            example:
+              user: 1
+              product: 101
       responses:
         '201':
           description: Favorite added successfully
           content:
             application/json:
               example:
-                message: "Favorite added successfully"
+                user: 1
+                product: 101
+        '400':
+          description: Bad request
+        '404':
+          description: User not found
+        '500':
+          description: Internal Server Error
 
     delete:
-      summary: Delete favorite
+      summary: Delete a favorite product
+      tags:
+        - Favorites
+      requestBody:
+        content:
+          application/json:
+            example:
+              user: 1
+              product: 101
+      responses:
+        '200':
+          description: Favorite deleted successfully
+        '400':
+          description: Bad request
+        '404':
+          description: Favorite not found
+        '500':
+          description: Internal Server Error
+
+  /favorites/user/{id}:
+    get:
+      summary: Search favorites for a user
       tags:
         - Favorites
       parameters:
-        - in: query
-          name: user_id
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: product_id
+        - name: id
+          in: path
           required: true
           schema:
             type: integer
       responses:
-        '204':
-          description: Favorite deleted successfully
+        '200':
+          description: User favorites
+          content:
+            application/json:
+              example:
+                user:
+                  id: 1
+                  name: John
+                favorites:
+                  - 101
+                  - 102
+        '404':
+          description: User not found
+        '500':
+          description: Internal Server Error

@@ -1,214 +1,320 @@
 package com.gfttraining.users.controllers;
 
+import com.gfttraining.users.models.Cart;
 import com.gfttraining.users.models.PaymentMethod;
 import com.gfttraining.users.models.User;
 import com.gfttraining.users.models.UserRequest;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import com.gfttraining.users.repositories.CartRepository;
+import com.gfttraining.users.services.FavoriteService;
+import com.gfttraining.users.services.UserService;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import net.minidev.json.JSONObject;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@SpringBootTest(webEnvironment = RANDOM_PORT)
 public class UserControllerIT {
-    //anyassert
+
+    @LocalServerPort
+    private int port;
+    private WebTestClient client;
     @Autowired
-    private TestRestTemplate restTemplate;
+    private FavoriteService favoriteService;
+
+    public UserControllerIT() {
+    }
+
+    //Initiate the web client
+    @PostConstruct
+    void init() {
+        client = WebTestClient.bindToServer()
+                .baseUrl("http://localhost:%d".formatted(port))
+                .build();
+    }
+
+        /*
+    ========= ORDER =========
+    1.- Create User.
+    2.- Create User. - USER Null
+    3.- Create User. - USER Not found
+    4.- Get All Users
+    5.- Get User By ID
+    6.- Get User By Name
+    7.- Load List of Users
+    8.- Update User By ID
+    9.- Delete User By ID
+    10.- Get User By ID - Not found
+    =========================
+*/
 
     @Test
-    @DisplayName("Create User")
-    public void testCreateUser() {
+    @DisplayName("GIVEN a valid UserRequest, WHEN a POST request is made to /users, THEN it should create a user in the database")
+    @Order(1)
+    void createUserTest() {
         UserRequest userRequest = new UserRequest(
                 "John",
-                "Doe",
+                "Lennon",
                 "123 Main St",
-                "City",
-                "Province",
-                12345,
-                "Spain",
+                "Liverpool",
+                "Merseyside",
+                13456,
+                "Portugal",
                 "PayPal",
-                100,
+                170,
                 75.0
         );
 
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity<UserRequest> requestEntity = new HttpEntity<>(userRequest, headers);
-
-        ResponseEntity<User> responseEntity = restTemplate.exchange("/users", HttpMethod.POST, requestEntity, User.class);
-
-        assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
-
-        User createdUser = responseEntity.getBody();
-
-        assertNotNull(createdUser);
-        assertEquals(createdUser.getName(), "John");
-        assertEquals(createdUser.getLastName(), "Doe");
-        assertEquals(createdUser.getAddress().getStreet(), "123 Main St");
-        assertEquals(createdUser.getAddress().getCity(), "City");
-        assertEquals(createdUser.getAddress().getProvince(), "Province");
-        assertEquals(createdUser.getAddress().getPostalCode(), 12345);
-        assertEquals(createdUser.getAddress().getCountry().getName(), "Spain");
-        assertEquals(createdUser.getPaymentMethod().getName(), "PayPal");
-        assertEquals(createdUser.getFidelityPoints(), 100);
-        assertEquals(createdUser.getAveragePurchase(), 75.0);
+        client.post().uri("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(userRequest)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody()
+                .jsonPath("$.name").isEqualTo("John")
+                .jsonPath("$.lastName").isEqualTo("Lennon")
+                .jsonPath("$.address.street").isEqualTo("123 Main St")
+                .jsonPath("$.address.city").isEqualTo("Liverpool")
+                .jsonPath("$.address.province").isEqualTo("Merseyside")
+                .jsonPath("$.address.postalCode").isEqualTo(13456)
+                .jsonPath("$.address.country.name").isEqualTo("Portugal")
+                .jsonPath("$.paymentMethod.name").isEqualTo("PayPal")
+                .jsonPath("$.fidelityPoints").isEqualTo(170)
+                .jsonPath("$.averagePurchase").isEqualTo(75.0);
     }
 
     @Test
-    @DisplayName("Update User by ID")
-    public void testUpdateUserById() {
-        long userId = 1L;
-
+    @DisplayName("GIVEN a UserRequest with a null name, WHEN a POST request is made to /users, THEN it should return " +
+            "a Bad Request response with a 'Name is required' validation error")
+    @Order(2)
+    void postCreateUserTestNull() {
         UserRequest userRequest = new UserRequest(
-                "John",
-                "Doe",
+                null,
+                "Lennon",
                 "123 Main St",
-                "City",
-                "Province",
-                12345,
-                "Spain",
+                "Liverpool",
+                "Merseyside",
+                13456,
+                "Portugal",
                 "PayPal",
-                100,
+                170,
                 75.0
         );
 
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity<UserRequest> requestEntity = new HttpEntity<>(userRequest, headers);
-
-        ResponseEntity<User> responseEntity = restTemplate.exchange("/users/" + userId, HttpMethod.PUT, requestEntity, User.class);
-
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-
-        User updatedUser = responseEntity.getBody();
-        assertEquals(updatedUser.getName(), "John");
-        assertEquals(updatedUser.getLastName(), "Doe");
-        assertEquals(updatedUser.getAddress().getStreet(), "123 Main St");
-        assertEquals(updatedUser.getAddress().getCity(), "City");
-        assertEquals(updatedUser.getAddress().getProvince(), "Province");
-        assertEquals(updatedUser.getAddress().getPostalCode(), 12345);
-        assertEquals(updatedUser.getAddress().getCountry().getName(), "Spain");
-        assertEquals(updatedUser.getPaymentMethod().getName(), "PayPal");
-        assertEquals(updatedUser.getFidelityPoints(), 100);
-        assertEquals(updatedUser.getAveragePurchase(), 75.0);
-
+        client.post().uri("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(userRequest)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$").isEqualTo("Validation error(s):\n Name is required;");
     }
 
     @Test
-    @DisplayName("Update User by ID - Negative Test")
-    public void testUpdateUserByIdNegative() {
-        long nonExistentUserId = 9999L;
+    @DisplayName("GIVEN a UserRequest with missing 'name' property, WHEN a POST request is made to /users, " +
+            "THEN it should return a Bad Request response with a 'Name is required' validation error")
+    @Order(3)
+    void postCreateUserTestInvalid() {
+        JSONObject userRequest = new JSONObject();
+        userRequest.put("lastName", "Lennon");
 
-        UserRequest updatedUserRequest = new UserRequest("UpdatedName", "UpdatedLastName", "UpdatedAddress", "UpdatedCity", "UpdatedProvince", 54321, "UpdatedCountry", "UpdatedPaymentMethod", 300, 90.0);
+        JSONObject address = new JSONObject();
+        address.put("street", "123 Main St");
+        address.put("city", "Liverpool");
+        address.put("province", "Merseyside");
+        address.put("postalCode", 13456);
 
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity<UserRequest> requestEntity = new HttpEntity<>(updatedUserRequest, headers);
+        JSONObject country = new JSONObject();
+        country.put("name", "Portugal");
 
-        ResponseEntity<String> responseEntity = restTemplate.exchange("/users/" + nonExistentUserId, HttpMethod.PUT, requestEntity, String.class);
+        address.put("country", country);
 
-        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        userRequest.put("address", address);
+        userRequest.put("paymentMethod", "PayPal");
+        userRequest.put("fidelityPoints", 170);
+        userRequest.put("averagePurchase", 75.0);
 
-        assertEquals("User not found", responseEntity.getBody());
+        String userRequestJson = userRequest.toString();
+
+        client.post().uri("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(userRequestJson)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$").isEqualTo("Validation error(s):\n" +
+                        " Name is required;");
     }
 
     @Test
-    @DisplayName("Get User by id")
-    public void testGetUserById() {
-        long userId = 1L;
-
-        ResponseEntity<User> responseEntity = restTemplate.getForEntity("/users/" + userId, User.class);
-
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-
-        User user = responseEntity.getBody();
-
-        assertNotNull(user);
-
-        assertEquals(userId, user.getId());
-
-        assertEquals("John", user.getName());
-        assertEquals("Doe", user.getLastName());
-        assertEquals("Sunset Blvd", user.getAddress().getStreet());
-        assertEquals("Barcelona", user.getAddress().getCity());
-        assertEquals("Catalonia", user.getAddress().getProvince());
-        assertEquals(12345, user.getAddress().getPostalCode());
-        assertEquals("Spain", user.getAddress().getCountry().getName());
-        assertEquals("Credit Card", user.getPaymentMethod().getName());
-        assertEquals(100, user.getFidelityPoints());
-        assertEquals(75.50, user.getAveragePurchase(), 0.001);
+    @DisplayName("GIVEN a list of users in the database, WHEN a GET request is made to /users/list, THEN it should " +
+            "return a list of users with their details including all attributes")
+    @Order(4)
+    void getListOfUsersTest() {
+        client.get().uri("/users")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$[0].name").isEqualTo("John")
+                .jsonPath("$[0].lastName").isEqualTo("Doe")
+                .jsonPath("$[0].address.street").isEqualTo("Sunset Blvd")
+                .jsonPath("$[0].address.city").isEqualTo("Barcelona")
+                .jsonPath("$[0].address.province").isEqualTo("Catalonia")
+                .jsonPath("$[0].address.postalCode").isEqualTo(12345)
+                .jsonPath("$[0].address.country.name").isEqualTo("Spain")
+                .jsonPath("$[0].paymentMethod.name").isEqualTo("Credit Card")
+                .jsonPath("$[0].fidelityPoints").isEqualTo(100)
+                .jsonPath("$[0].averagePurchase").isEqualTo(75.50)
+                .jsonPath("$[1].name").isEqualTo("Jane")
+                .jsonPath("$[1].lastName").isEqualTo("Smith")
+                .jsonPath("$[1].address.street").isEqualTo("Green Valley Rd")
+                .jsonPath("$[1].address.city").isEqualTo("Tallinn")
+                .jsonPath("$[1].address.province").isEqualTo("Harju County")
+                .jsonPath("$[1].address.postalCode").isEqualTo(56789)
+                .jsonPath("$[1].address.country.name").isEqualTo("Estonia")
+                .jsonPath("$[1].paymentMethod.name").isEqualTo("PayPal")
+                .jsonPath("$[1].fidelityPoints").isEqualTo(150)
+                .jsonPath("$[1].averagePurchase").isEqualTo(100.20);
     }
 
     @Test
-    @DisplayName("Load List of Users")
-    public void testLoadListOfUsers() {
-        List<UserRequest> userRequestList = new ArrayList<>();
-        userRequestList.add(new UserRequest("John", "Doe", "123 Main St", "City", "Province", 12345, "Spain", "PayPal", 100, 75.0));
-        userRequestList.add(new UserRequest("Alice", "Johnson", "456 Elm St", "Another City", "Another Province", 54321, "Estonia", "Credit Card", 200, 50.0));
-
-        HttpEntity<List<UserRequest>> requestEntity = new HttpEntity<>(userRequestList);
-
-        ParameterizedTypeReference<List<User>> responseType = new ParameterizedTypeReference<List<User>>() {};
-        ResponseEntity<List<User>> responseEntity = restTemplate.exchange("/users/load", HttpMethod.POST, requestEntity, responseType);
-
-        assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
-
-        List<User> savedUsers = responseEntity.getBody();
-
-        assertNotNull(savedUsers);
-
-        assertEquals("John", savedUsers.get(0).getName());
-        assertEquals("Doe", savedUsers.get(0).getLastName());
-        assertEquals("123 Main St", savedUsers.get(0).getAddress().getStreet());
-        assertEquals("City", savedUsers.get(0).getAddress().getCity());
-        assertEquals("Province", savedUsers.get(0).getAddress().getProvince());
-        assertEquals(12345, savedUsers.get(0).getAddress().getPostalCode());
-        assertEquals("Spain", savedUsers.get(0).getAddress().getCountry().getName());
-        assertEquals("PayPal", savedUsers.get(0).getPaymentMethod().getName());
-        assertEquals(100, savedUsers.get(0).getFidelityPoints());
-        assertEquals(75.0, savedUsers.get(0).getAveragePurchase());
-
-        assertEquals("Alice", savedUsers.get(1).getName());
-        assertEquals("Johnson", savedUsers.get(1).getLastName());
-        assertEquals("456 Elm St", savedUsers.get(1).getAddress().getStreet());
-        assertEquals("Another City", savedUsers.get(1).getAddress().getCity());
-        assertEquals("Another Province", savedUsers.get(1).getAddress().getProvince());
-        assertEquals(54321, savedUsers.get(1).getAddress().getPostalCode());
-        assertEquals("Estonia", savedUsers.get(1).getAddress().getCountry().getName());
-        assertEquals("Credit Card", savedUsers.get(1).getPaymentMethod().getName());
-        assertEquals(200, savedUsers.get(1).getFidelityPoints());
-        assertEquals(50.0, savedUsers.get(1).getAveragePurchase());
+    @DisplayName("GIVEN a user with ID 1 in the database, WHEN a GET request is made to /users/1, THEN it should " +
+            "return user details including all attributes")
+    @Order(5)
+    void getUserByIdTest() {
+        client.get().uri("/users/1")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(1)
+                .jsonPath("$.name").isEqualTo("John")
+                .jsonPath("$.lastName").isEqualTo("Doe")
+                .jsonPath("$.address.id").isEqualTo(1)
+                .jsonPath("$.address.street").isEqualTo("Sunset Blvd")
+                .jsonPath("$.address.city").isEqualTo("Barcelona")
+                .jsonPath("$.address.province").isEqualTo("Catalonia")
+                .jsonPath("$.address.postalCode").isEqualTo(12345)
+                .jsonPath("$.address.country.id").isEqualTo(1)
+                .jsonPath("$.address.country.name").isEqualTo("Spain")
+                .jsonPath("$.paymentMethod.id").isEqualTo(1)
+                .jsonPath("$.paymentMethod.name").isEqualTo("Credit Card")
+                .jsonPath("$.fidelityPoints").isEqualTo(100)
+                .jsonPath("$.averagePurchase").isEqualTo(75.50);
     }
 
     @Test
-    @DisplayName("List of Users")
-    public void testGetListOfUsers() {
-        ResponseEntity<String> responseEntity = restTemplate.getForEntity("/users/list", String.class);
+    @DisplayName("GIVEN multiple users in the database with names containing 'John', WHEN a GET request is made to " +
+            "/users/list?name=John, THEN it should return a list of users matching the criteria including all attributes")
+    @Order(6)
+    void getListOfUsersByNameTest() {
+        String nameToFilter = "John";
+        client.get().uri("/users/search/" + nameToFilter)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$[0].name").isEqualTo("John")
+                .jsonPath("$[0].lastName").isEqualTo("Doe")
+                .jsonPath("$[0].address.street").isEqualTo("Sunset Blvd")
+                .jsonPath("$[0].address.city").isEqualTo("Barcelona")
+                .jsonPath("$[0].address.province").isEqualTo("Catalonia")
+                .jsonPath("$[0].address.postalCode").isEqualTo(12345)
+                .jsonPath("$[0].address.country.name").isEqualTo("Spain")
+                .jsonPath("$[0].paymentMethod.name").isEqualTo("Credit Card")
+                .jsonPath("$[0].fidelityPoints").isEqualTo(100)
+                .jsonPath("$[0].averagePurchase").isEqualTo(75.50)
+                .jsonPath("$[1].name").isEqualTo("John")
+                .jsonPath("$[1].lastName").isEqualTo("Lennon")
+                .jsonPath("$[1].address.street").isEqualTo("123 Main St")
+                .jsonPath("$[1].address.city").isEqualTo("Liverpool")
+                .jsonPath("$[1].address.province").isEqualTo("Merseyside")
+                .jsonPath("$[1].address.postalCode").isEqualTo(13456)
+                .jsonPath("$[1].address.country.name").isEqualTo("Portugal")
+                .jsonPath("$[1].paymentMethod.name").isEqualTo("PayPal")
+                .jsonPath("$[1].fidelityPoints").isEqualTo(170)
+                .jsonPath("$[1].averagePurchase").isEqualTo(75.0)
+                .jsonPath("$[99].name").doesNotExist();
+    }
 
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
-        String responseBody = responseEntity.getBody();
+    @Test
+    @DisplayName("GIVEN an existing user with ID 1 in the database, WHEN a PUT request is made to /users/1 to update " +
+            "user information, THEN it should update the user's data and return the updated user details")
+    @Order(8)
+    void updateUserByIdTest() {
+        long userIdToUpdate = 2L;
+        UserRequest updatedUser = new UserRequest(
+                "Carlos",
+                "Gonzalez",
+                "Industria",
+                "Sabadell",
+                "Barcelona",
+                57362,
+                "Spain",
+                "PayPal",
+                300,
+                85.0
+        );
+
+        client.put().uri("/users/" + userIdToUpdate)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(updatedUser)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.name").isEqualTo("Carlos")
+                .jsonPath("$.lastName").isEqualTo("Gonzalez")
+                .jsonPath("$.address.street").isEqualTo("Industria")
+                .jsonPath("$.address.city").isEqualTo("Sabadell")
+                .jsonPath("$.address.province").isEqualTo("Barcelona")
+                .jsonPath("$.address.postalCode").isEqualTo(57362)
+                .jsonPath("$.address.country.name").isEqualTo("Spain")
+                .jsonPath("$.paymentMethod.name").isEqualTo("PayPal")
+                .jsonPath("$.fidelityPoints").isEqualTo(300)
+                .jsonPath("$.averagePurchase").isEqualTo(85.0);
     }
 
     @Test
-    @DisplayName("Delete User by ID")
-    public void testDeleteUserById() {
-        long userIdToDelete = 1L;
+    @DisplayName("GIVEN an existing user with ID 11 in the database, WHEN a DELETE request is made to /users/11, " +
+            "THEN the user should be deleted successfully")
+    @Order(9)
+    void deleteUserByIdTest() {
+        long userIdToDelete = 11L;
 
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity<Object> requestEntity = new HttpEntity<>(headers);
+        client.delete().uri("/users/" + userIdToDelete)
+                .exchange()
+                .expectStatus().isOk();
 
-        ResponseEntity<String> responseEntity = restTemplate.exchange("/users/" + userIdToDelete, HttpMethod.DELETE, requestEntity, String.class);
+        client.get().uri("/users/" + userIdToDelete)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
 
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+    @Test
+    @DisplayName("GIVEN a deleted user with ID 11, WHEN a GET request is made to /users/11, " +
+            "THEN it should return 'Not Found'")
+    @Order(10)
+    void getDeletedUserByIdTest() {
+        long deletedUserId = 11L;
 
-        assertEquals("User deleted successfully", responseEntity.getBody());
+        client.get().uri("/users/" + deletedUserId)
+                .exchange()
+                .expectStatus().isNotFound();
     }
 
 }
